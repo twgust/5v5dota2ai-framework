@@ -1,5 +1,7 @@
 #5v5 Dota 2 framework
 
+dota_launch_custom_game dota2ai dota
+
 ## About
 
 This is a DotA 2 bot framework intended and needed to be run with the updated [DoTa 2 ADDON dota2ai](https://github.com/ellakk/5v5dota2ai-addon).
