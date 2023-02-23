@@ -35,6 +35,7 @@ class TestBotBuyback(BaseBot):
 
     def __init__(self, world: World) -> None:
         self._world = world
+        print(world.get_team())
         self._party = party[world.get_team()]
 
     def get_party(self) -> list[str]:
