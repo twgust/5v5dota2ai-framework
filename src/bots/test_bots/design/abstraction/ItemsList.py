@@ -14,7 +14,6 @@ class ItemsList:
 
     def load_data(self):
         self.jsonOpener('items.json')
-
         # self.openJsonFile('items.json')
         # self.items_list = self.openJsonFile('items.json')
         #  for item in self.items_list:
@@ -53,7 +52,7 @@ class ItemsList:
             # print(value)
         return data
 
-    def jsonOpener(self, filename: str):
+    def jsonOpener(self, filename: str) -> list:
         itemlist = []
         print("Started Reading JSON file which contains multiple JSON document")
         with open(filename, 'r') as f:
@@ -91,3 +90,4 @@ class ItemsList:
                 itemlist.append(dota2_item)
         print("Finished Reading JSON file which contains multiple JSON document")
         print(itemlist)
+        return itemlist
