@@ -1,6 +1,6 @@
 from typing import Literal, TypedDict, Union, cast
 
-from bots.hero_bots import sniper
+from bots.hero_bots import SniperMid
 from game.physical_entity import PhysicalEntity
 from game.rune import Rune
 from game.enums.ability_behavior import AbilityBehavior
@@ -117,31 +117,21 @@ class TestHeroTeam(BaseBot):
     _courier_transferring_items: dict[str, bool]
     _go_aggressive_step1: bool
     _go_aggressive_step2: bool
+    _sniper_obj: sniper.Sniper
 
     def __init__(self, world: World) -> None:
         team: int = world.get_team()
 
         self._world = world
         self._party = list(party[world.get_team()].keys())
-        self._should_move_home = {}
-        self._home_position = home_position[team]
-        self._secret_shop_position = secret_shop_position[team]
-        self._lane_tower_positions = {}
-        self._courier_moving_to_secret_shop = {}
-        self._courier_transferring_items = {}
-        self._go_aggressive_step1 = False
-        self._go_aggressive_step2 = False
 
     def get_party(self) -> list[str]:
         return self._party
 
     def initialize(self, heroes: list[PlayerHero]) -> None:
         self._heroes = heroes
-        for hero in heroes:
-            self._should_move_home[hero.get_name()] = False
-            self._courier_moving_to_secret_shop[hero.get_name()] = False
-            self._courier_transferring_items[hero.get_name()] = False
-        self.initialize_lane_tower_positions()
+        """#Initialise objects for heroes"""
+        _sniper_obj = SniperMid.SniperMid()
 
     def initialize_lane_tower_positions(self) -> None:
         for lane_tower_name in [
@@ -178,5 +168,6 @@ class TestHeroTeam(BaseBot):
             self._go_aggressive_step2 = True
 
     def actions(self, hero: PlayerHero, game_ticks: int) -> None:
+        """#Check which hero logic to call"""
         if hero.get_name() == "npc_dota_hero_sniper":
-            sniper.sniper.get_move(hero, game_ticks)
+            self._sniper_obj.get_move(hero, game_ticks, self._world)

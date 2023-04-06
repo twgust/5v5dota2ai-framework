@@ -57,6 +57,7 @@ party = {
     ],
 }
 
+
 class SuperBot(BaseBot):
     _world: World
     _party: list[str]
@@ -69,6 +70,7 @@ class SuperBot(BaseBot):
         self._party = party[world.get_team()]
         self._lane_tower_positions = {}
         self._carries = []
+
     def get_party(self) -> list[str]:
         return self._party
 
@@ -78,14 +80,8 @@ class SuperBot(BaseBot):
             if attribute.__contains__("agility"):
                 my_hero = Carry(hero.get_name(), attribute)
                 self._carries.append(my_hero)
-
         for carry in self._carries:
             print(carry.hero_name)
 
-
     def actions(self, hero: PlayerHero, game_ticks: int):
         return
-
-
-
-
