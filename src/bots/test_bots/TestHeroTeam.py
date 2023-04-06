@@ -117,7 +117,7 @@ class TestHeroTeam(BaseBot):
     _courier_transferring_items: dict[str, bool]
     _go_aggressive_step1: bool
     _go_aggressive_step2: bool
-    _sniper_obj: sniper.Sniper
+    _sniper_obj: SniperMid.SniperMid
 
     def __init__(self, world: World) -> None:
         team: int = world.get_team()
@@ -171,3 +171,4 @@ class TestHeroTeam(BaseBot):
         """#Check which hero logic to call"""
         if hero.get_name() == "npc_dota_hero_sniper":
             self._sniper_obj.get_move(hero, game_ticks, self._world)
+        """Here you can continue with calling other heroes, or implement a general logic for the remaining heroes"""
