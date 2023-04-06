@@ -38,7 +38,7 @@ party: dict[int, dict[str, HeroData]] = {
             "boots": PHASE,
             "lane": TOP,
         },
-        "npc_dota_hero_batrider": {
+        "npc_dota_hero_sniper": {
             "boots": ARCANE,
             "lane": MID,
         },
@@ -86,7 +86,7 @@ secret_shop_position = {
 }
 
 
-class TestBotBasicSmart(BaseBot):
+class TestHeroTeam(BaseBot):
     '''
     Tests:
 
@@ -179,4 +179,4 @@ class TestBotBasicSmart(BaseBot):
 
     def actions(self, hero: PlayerHero, game_ticks: int) -> None:
         if hero.get_name() == "npc_dota_hero_sniper":
-            sniper.sniper.get_move(self, hero, game_ticks)
+            sniper.sniper.get_move(hero, game_ticks)

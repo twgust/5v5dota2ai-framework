@@ -1,7 +1,7 @@
 {
   "base_dir_bots": "bots/test_bots/",
-  "radiant_bot_filename": "SuperBot.py",
-  "radiant_bot_class_name": "SuperBot",
+  "radiant_bot_filename": "TestHeroBot.py",
+  "radiant_bot_class_name": "TestHeroBot",
   "dire_bot_filename": "SuperBot.py",
   "dire_bot_class_name": "SuperBot",
   "native_bots_difficulty": "easy",

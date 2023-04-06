@@ -47,4 +47,4 @@ class Dota2Item:
 
     def get_attribute(self) -> list[str]: return self.attribute
 
-    def to_string(self) -> str: return self.name + " " + self.cost + " " + self.hasActiveEffect + " " + self.activeEffect + " " + self.role + " " + self.attribute
+    def to_string(self) -> str: return self.name
