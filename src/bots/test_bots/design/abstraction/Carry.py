@@ -1,18 +1,76 @@
+from typing import List, Type
+
+from bots.test_bots.design.abstraction.Dota2Item import Dota2Item
+from bots.test_bots.design.abstraction.RecipeItem import RecipeItem
 from bots.test_bots.design.abstraction.Role import Role
+from game.player_hero import PlayerHero
+from bots.test_bots.design.abstraction.ItemsList import ItemsList
+
 
 # implementation of a hero, e.g. __init__(self, 'sniper', 'strength')
 class Carry(Role):
-    def __init__(self, hero_name, attribute):
-        self.hero_name = hero_name
-        self.attribute = attribute
+    # OFF == Only buy items in _target_items,
+    # ON == Buy items in _target_items and items that are good for the hero
+    _smart_buy = True
+    _attribute: str
+    _my_items_list: ItemsList
+    _target_items: [Dota2Item]
+
+    def __init__(self, hero: PlayerHero, attribute: str):
+        self.player_hero = hero
+        self._attribute = attribute
+        self._my_items_list = ItemsList()
+        self._target_items = [Dota2Item("tango", 90, True, "", "")]
+
         print("INIT CARRY")
-        best_carry_items_dict = self.get_best_items("carry", "intelligence")
 
     def get_attribute(self):
-        return self.attribute
+        return self._attribute
 
     def get_hero_name(self):
-        return self.hero_name
+        return self.player_hero.get_name()
 
-    def get_best_items(self, role: str, attribute: str) -> dict[str, int]:
-        print("ok")
+    def validate_list_of_items(self, items: list[Dota2Item]) -> list[Dota2Item]:
+        current_items = self.player_hero.get_items()
+        items = [item for item in items if item.name not in [current_item.name for current_item in current_items]]
+        return items
+
+    # WIP
+    def buy_target_items(self):
+        for targets in self._target_items:
+            if targets.cost < self.player_hero.get_gold():
+                buy_item = "item_" + targets.name
+                self.player_hero.buy("buy_item")
+                print(buy_item + " " + str(targets.cost))
+    #WIP
+    def find_potential_items(self, potential_items: list[Dota2Item]):
+        if potential_items:
+            # buy the item with the highest cost affordable to hero
+            max_cost_item = max(potential_items, key=lambda item: item.cost)
+            print(max_cost_item.name + " " + str(max_cost_item.cost) + " " + str(self.player_hero.get_gold()))
+            buy_item = "item_" + max_cost_item.get_name()
+            self.player_hero.buy(buy_item)
+            print(max_cost_item.name + " " + str(max_cost_item.cost) + " " + str(self.player_hero.get_gold()))
+
+    def get_best_items(self, role: str):
+        # start gold
+        gold = self.player_hero.get_gold()
+        # get items for the attribute we're focusing on building for
+        items_attribute_list = self._my_items_list.get_attribute_list(self.get_attribute())
+        # validate the list, removing invalid/undesired entries
+        #items_attribute_list = self.validate_list_of_items(items_attribute_list)
+
+        # smart_buy is ON
+        if self._smart_buy:
+            # first priority is buying items in target list
+            #self.buy_target_items()
+            # second priority is buying items that are potentially good for the hero
+            potential_items = self.find_items_by_cost(self.player_hero.get_gold(), items_attribute_list)
+            self.find_potential_items(potential_items)
+        # smart_buy is OFF
+        else:
+            self.buy_target_items()
+        print(
+            "SHOPPING COMPLETED:" + self.player_hero.get_name() + "\ngold left:" + str(
+                self.player_hero.get_gold()) + ", gold spent=" + str(
+                gold - self.player_hero.get_gold()))

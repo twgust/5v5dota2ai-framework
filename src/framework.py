@@ -5,6 +5,9 @@ from framework_util import exit_with_error, load_class, BotClassError
 from statistics import Statistics
 from webserver import setup_web_server
 from pathlib import Path
+from bots.test_bots.design.abstraction.Dota2Item import Dota2Item
+
+
 
 RADIANT_TEAM = 2
 DIRE_TEAM = 3

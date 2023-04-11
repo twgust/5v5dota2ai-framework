@@ -1,8 +1,7 @@
 ## data structure for the class Dota2Item.py, represents a list of items. Initializes the list by using OpenDota2API.py to get the list of items from OpenDota2 API
-from bots.test_bots.design.abstraction import Dota2Item
+from bots.test_bots.design.abstraction.Dota2Item import Dota2Item
 import json
 import ijson
-from Dota2Item import Dota2Item
 from bots.test_bots.design.abstraction.RecipeItem import RecipeItem
 
 
@@ -18,9 +17,11 @@ class ItemsList:
     _items_list_recipes: list[RecipeItem]
 
     def __init__(self):
+        self.load_data()
         print("Ok")
+
     def load_data(self):
-        self._items_list = self.jsonOpener('items.json')
+        self._items_list = self.jsonOpener('bots/test_bots/design/abstraction/items.json')
         self._items_list.sort(key=lambda item: item.cost)
         self._items_list_passive = self.getAllPassiveItems()
         self._items_list_active = self.getAllActiveItems()
@@ -35,10 +36,18 @@ class ItemsList:
         # self.parse_items_list(dict)
         print("test")
 
+    def get_attribute_list(self, attribute: str) -> list[Dota2Item]:
+        if attribute == "Strength":
+            return self._items_list_strength
+        elif attribute == "Agility":
+            return self._items_list_agility
+        elif attribute == "Intelligence":
+            return self._items_list_intelligence
+        else:
+            return self.get_items_list()
+
     def get_items_list(self) -> list[Dota2Item]:
-        for Dota2Item in self.items_list:
-            print(Dota2Item.to_string())
-        return self.items_list
+        return self._items_list
 
     def parse_items_list(self, json: dict) -> list[Dota2Item]:
         for item in json:
@@ -81,9 +90,6 @@ class ItemsList:
         self._items_list_agility = agility_items_list
         self._items_list_intelligence = intelligence_items_list
 
-
-
-
     def getAllPassiveItems(self) -> list[Dota2Item]:
         passive_items_list = []
         for item in self._items_list:
@@ -104,18 +110,24 @@ class ItemsList:
             if isinstance(item, RecipeItem):
                 recipe_items_list.append(item)
         return recipe_items_list
+
+    def validateDota2Item(self, item: Dota2Item) -> Dota2Item:
+        if item.cost is None:
+            item.cost = 0
+            return item
+
     def jsonOpener(self, filename: str) -> list:
         itemlist = []
         print("Started Reading JSON file which contains multiple JSON document")
         with open(filename, 'r') as f:
             data = json.load(f)
             list_of_items = data.keys()
+            myList = list(list_of_items)
             item_has_active_effect = False
+            i: int = 0
             for item in list_of_items:
+                name = myList.__getitem__(i)
                 item_name = data.get(item).get("dname")
-                item_cost = data.get(item).get("cost")
-                if (item_cost == 0 or item_cost == None):
-                    continue
                 item_cd = data.get(item).get("cd")
                 item_notes = data.get(item).get("notes")
                 if int(item_cd) <= 0:
@@ -123,7 +135,7 @@ class ItemsList:
                 else:
                     item_has_active_effect = True
                 item_components = data.get(item).get("components")
-
+                item_cost = data.get(item).get("cost")
                 attribs = data.get(item).get("attrib")
                 if attribs is None:
                     item_attribute = "None"
@@ -142,11 +154,24 @@ class ItemsList:
                         else:
                             attribute_value = "empty"
                             attrib_array.append(attribute_value)
-                if item_components == None:
-                    dota2_item = Dota2Item(item_name, item_cost, item_has_active_effect, item_notes, attrib_array)
-                    itemlist.append(dota2_item)
+                if item_components is None:
+                    dota2_item = Dota2Item(name, item_cost, item_has_active_effect, item_notes, attrib_array)
+                    self.validateDota2Item(dota2_item)
+                    # can probably remove this
+                    if item_cost is not 0:
+                        itemlist.append(dota2_item)
                 else:
-                    dota2_item = RecipeItem(item_name, item_cost, item_has_active_effect, item_notes, attrib_array, item_components)
-                    itemlist.append(dota2_item)
+                    dota2_item = RecipeItem(name, item_cost, item_has_active_effect, item_notes, attrib_array,
+                                            item_components)
+                    self.validateDota2Item(dota2_item)
+                    # can probably remove this
+                    if item_cost is not 0:
+                        itemlist.append(dota2_item)
+
+                i = i + 1
         print("Finished Reading JSON file which contains multiple JSON document")
         return itemlist
+
+    @property
+    def items_list_strength(self):
+        return self._items_list_strength

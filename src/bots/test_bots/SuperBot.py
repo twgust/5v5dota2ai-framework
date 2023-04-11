@@ -3,6 +3,7 @@ from bots.test_bots.design.abstraction.Carry import Carry
 from game.player_hero import PlayerHero
 from game.world import World
 from framework import RADIANT_TEAM, DIRE_TEAM
+from bots.test_bots.design.abstraction.Dota2Item import Dota2Item
 
 from game.unit import Unit
 from typing import Union, Literal, TypedDict
@@ -37,7 +38,7 @@ test: dict[str, dict[str]] = {
         "agility"
     },
     "npc_dota_hero_lich": {
-        "intelligence"
+        "agility"
     },
 }
 party = {
@@ -57,11 +58,13 @@ party = {
     ],
 }
 
+
 class SuperBot(BaseBot):
     _world: World
     _party: list[str]
     _heroes: list[PlayerHero]
     _carries: list[Carry]
+    _carries_dict: dict[str, Carry]
 
     def __init__(self, world: World) -> None:
         self._world = world
@@ -69,23 +72,24 @@ class SuperBot(BaseBot):
         self._party = party[world.get_team()]
         self._lane_tower_positions = {}
         self._carries = []
+        self._carries_dict = {}
+
     def get_party(self) -> list[str]:
         return self._party
 
     def initialize(self, heroes: list[PlayerHero]):
         for hero in heroes:
+            # get attribute from dictionary
             attribute = test.get(hero.get_name())
             if attribute.__contains__("agility"):
-                my_hero = Carry(hero.get_name(), attribute)
+                my_hero = Carry(hero, attribute)
+                self._carries_dict[hero.get_name()] = my_hero
                 self._carries.append(my_hero)
 
-        for carry in self._carries:
-            print(carry.hero_name)
-
-
     def actions(self, hero: PlayerHero, game_ticks: int):
-        return
+            carry_hero = self._carries_dict.get(hero.get_name())
 
-
-
-
+            if carry_hero is not None and game_ticks % 15 == 0:
+                print("--------------------")
+                carry_hero.get_best_items("carry")
+            return

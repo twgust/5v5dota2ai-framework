@@ -48,3 +48,7 @@ class Item(BaseEntity):
 
     def get_type(self) -> EntityType:
         return EntityType.ITEM
+
+    @property
+    def name(self):
+        return self._name
