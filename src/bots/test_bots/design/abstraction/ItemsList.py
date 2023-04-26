@@ -158,14 +158,14 @@ class ItemsList:
                     dota2_item = Dota2Item(name, item_cost, item_has_active_effect, item_notes, attrib_array)
                     self.validateDota2Item(dota2_item)
                     # can probably remove this
-                    if item_cost is not 0:
+                    if item_cost != 0:
                         itemlist.append(dota2_item)
                 else:
                     dota2_item = RecipeItem(name, item_cost, item_has_active_effect, item_notes, attrib_array,
                                             item_components)
                     self.validateDota2Item(dota2_item)
                     # can probably remove this
-                    if item_cost is not 0:
+                    if item_cost != 0:
                         itemlist.append(dota2_item)
 
                 i = i + 1

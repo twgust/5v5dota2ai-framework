@@ -45,5 +45,5 @@ class Role:
         pass
 
     @abstractmethod
-    def get_best_items(self, role_name: str) -> list[Dota2Item]:
+    def buy_items(self, role_name: str) -> list[Dota2Item]:
         pass

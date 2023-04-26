@@ -90,6 +90,6 @@ class SuperBot(BaseBot):
             carry_hero = self._carries_dict.get(hero.get_name())
 
             if carry_hero is not None and game_ticks % 15 == 0:
-                print("--------------------")
-                carry_hero.get_best_items("carry")
+                print("$$$ " + PlayerHero.get_name(hero) + " is buying items $$$")
+                carry_hero.buy_items("carry")
             return
