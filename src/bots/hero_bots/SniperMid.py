@@ -15,18 +15,18 @@ class SniperMid(BaseHero):
     _world: World
     _party: list[str]
     _heroes: list[PlayerHero]
-    _items: list[str]
+    _items = dict[int, str]
 
     def __init__(self):
         self.initialise_items()
 
     def initialise_items(self) -> None:
-        _items = ['Power treads', 'Maelstrom', 'Dragon lance', 'Mjolnir', 'Daedalus', 'Monkey king bar', 'Butterfly',
-                  'Eye of skadi']
+        self._items = {1: 'power treads', 2: 'Maelstrom', 3: 'Dragon lance', 4: 'Mjolnir', 5: 'Daedalus', 6: 'Monkey king bar', 7: 'Butterfly'}
 
     '''Get a move generated from this specific hero, takes the hero object and current world object as parameter'''
 
     def get_move(self, hero: PlayerHero, game_ticks: int, world: World) -> None:
+
         if world.get_team() == RADIANT_TEAM:
             hero.move(500, 500, 0)
             if not hero.is_alive():
