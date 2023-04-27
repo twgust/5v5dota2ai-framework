@@ -60,8 +60,9 @@ class Carry(Role):
         components = item.get_required_items()
         item_names_tuple = tuple(item.name for item in components)
         print("tuple: " + ", ".join([str(x) for x in item_names_tuple]))
-        self.player_hero.buy_combined(item_names_tuple)
-        return item_names_tuple
+        testlist = ["item_circlet", "item_gauntlets", "item_recipe_bracer"]
+        self.player_hero.buy_combined(testlist)
+        return testlist
 
     # returns true if complete item was bought,
     # returns false if partial item or nothing was bought
@@ -108,6 +109,8 @@ class Carry(Role):
         gauntlets_item = Dota2Item("gauntlets", 140, False, None, ["strength"])
         recipe_bracer = Dota2Item("recipe_bracer", 210, False, None, None)
         recipe_item = RecipeItem("bracer", 505, False, "The bracer is a common choice to toughen up defenses and increase longevity", None, [circlet_item, gauntlets_item, recipe_bracer])
+        self.generate_item_tuple(recipe_item)   #TEST
+        return                                  #TEST
         if self.buy_recipe_item(recipe_item): #Test
             print("BUY_RECIPE_ITEM returns true")
             return True

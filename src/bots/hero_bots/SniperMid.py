@@ -47,7 +47,6 @@ class SniperMid(BaseHero):
         if self.level_up_ability(hero):
             return
         if hero.get_gold() > 505:
-            hero.buy("item_buckler")
             return
 
     def level_up_ability(self, hero: PlayerHero) -> bool:

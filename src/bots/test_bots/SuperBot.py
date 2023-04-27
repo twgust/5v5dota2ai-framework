@@ -92,6 +92,7 @@ class SuperBot(BaseBot):
             # carry_hero.player_hero.buy("item_tango")
             print("$$$ " + PlayerHero.get_name(hero) + " is buying items $$$")
             carry_hero.buy_items("carry")
+            print(hero.get_command())
             #print(carry_hero._my_items_list.get_item_dict().get("bracer").to_string())
 
         return

@@ -278,7 +278,7 @@ class PlayerHero(Hero):
             }
         }
 
-    def buy_combined(self, item_names: tuple) -> None:
+    def buy_combined(self, item_names: list) -> None:
         """
         Buy items by given `item_names`.
 
