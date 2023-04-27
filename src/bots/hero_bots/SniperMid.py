@@ -44,8 +44,6 @@ class SniperMid(BaseHero):
                 hero.buyback()
             else:
                 assert hero.get_buyback_cooldown_time() == 0
-        if game_ticks > 100:
-            print("woop woop")
         if self.level_up_ability(hero):
             return
 

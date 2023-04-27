@@ -36,23 +36,21 @@ class Carry(Role):
         items = [item for item in items if item.name not in [current_item.name for current_item in current_items]]
         return items
 
-    def buy_recipe_item(self, item: RecipeItem)-> None:
+    def buy_recipe_item(self, item: RecipeItem) -> None:
         #components = item.get_required_items()
+        print(self.player_hero.get_name() + " is attempting to buy the item " + item.get_name() + " with components ,".join([str(x.get_name()) for x in item.get_required_items()]))
         self.player_hero.buy("item_tango")
         self.player_hero.buy("item_" + item.name)
-        print(item.name + "-item.name")
+        print("BUYING " + item.name)
         for items in self.player_hero.get_items():
             print(items.get_name() + "-addon name")
         if item.name in self.player_hero.get_items():
-            return
+            return None
         else:
             for component in item.get_required_items():
-                print("item_" + str(component.get_cost()) + "??????????")
-                self.player_hero.buy("item_" + component)
-
-
-
-
+                print("attempting to buy subcompontent, complete item too expensive... "
+                      "item_" + str(component.name) + " cost:" +  str(component.get_cost()) + " ??????????")
+                self.player_hero.buy("item_" + component.name)
 
     # WIP
     def buy_target_items(self) -> list[Dota2Item]:
@@ -77,14 +75,12 @@ class Carry(Role):
     # returns the items that have so far been bought by a given hero
     def buy_items(self, role_name: str) -> list[Dota2Item]:
         # start gold
-        gold = self.player_hero.get_gold()
-        recipe_item_list = self._my_items_list.getAllRecipeItems()
-        bracer_item = None
-        for items in recipe_item_list:
-            if items.name == "bracer":
-                bracer_item = items
-        if bracer_item is not None:
-            self.buy_recipe_item(bracer_item)
+        print(self.player_hero.get_name() + " INVENTORY: " + " ,".join(self.player_hero.get_items()))
+        self.player_hero.buy("item_bottle")
+        circlet_item = Dota2Item("item_circlet", 155, False, None, ["strength", "agility", "intelligence"])
+        gauntlets_item = Dota2Item("item_gauntlets", 140, False, None, ["strength"])
+        recipe_item = RecipeItem("item_bracer", 505, False, "The bracer is a common choice to toughen up defenses and increase longevity",None, [circlet_item, gauntlets_item])
+        self.buy_recipe_item(recipe_item)
         # get items for the attribute we're focusing on building for
         items_attribute_list = self._my_items_list.get_attribute_list(self.get_attribute())
         # smart_buy is ON

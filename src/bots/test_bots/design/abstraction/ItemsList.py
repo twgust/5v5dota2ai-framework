@@ -148,8 +148,11 @@ class ItemsList:
     # returns true if the item is not a component of another item
     def isBaseItem(self, item: str, data: dict) -> bool:
         item_list = data.keys()
+        # iterate over all the entries in the json file
         for json_item in item_list:
+            # if the components of an entry isn't null
             if data.get(json_item).get("components") is not None:
+                # if list of components contains our item return false
                 if data.get(json_item).get("components").__contains__(item):
                     print("original item [" + item + "] is a component of another item [" + json_item + "] "
                           + "with components: " + str(data.get(json_item).get("components")))

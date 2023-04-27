@@ -87,10 +87,6 @@ class SuperBot(BaseBot):
                 self._carries.append(my_hero)
 
     def actions(self, hero: PlayerHero, game_ticks: int):
-        for ability in hero.get_abilities():
-            print(ability.get_ability_index())
-            print(ability.get_name())
-
         carry_hero = self._carries_dict.get(hero.get_name())
         if carry_hero is not None and game_ticks % 15 == 0:
             print("$$$ " + PlayerHero.get_name(hero) + " is buying items $$$")
