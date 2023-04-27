@@ -6,6 +6,9 @@ from game.world import World
 class BaseHero:
 
     @abstractmethod
+    def initialise_skill_build(self) -> None:
+        pass
+    @abstractmethod
     def initialise_items(self) -> None:
         pass
 
