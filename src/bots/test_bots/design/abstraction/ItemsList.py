@@ -116,6 +116,46 @@ class ItemsList:
             item.cost = 0
             return item
 
+    def createRecipeItem(self, item: str, data: dict) -> RecipeItem:
+        item_components = data.get(item).get("components")
+        print(item_components)
+        item_cd = data.get(item).get("cd")
+        my_list = [Dota2Item]
+        for component in data.get(item).get("components"):
+            if component is not None:
+                temp_dota2_item_name = data.get(component).get("dname")
+                temp_dota2_item_cost = data.get(component).get("cost")
+
+                if int(item_cd) <= 0:
+                    temp_dota2_item_active_effect = False
+                else:
+                    temp_dota2_item_active_effect = True
+                temp_dota2_item_notes = data.get(component).get("notes")
+                temp_dota2_item_attribs = data.get(component).get("attrib")
+
+                ##if self.isBaseItem(component, data):
+                dota2_item = Dota2Item(temp_dota2_item_name, temp_dota2_item_cost, temp_dota2_item_active_effect,
+                                       temp_dota2_item_notes, temp_dota2_item_attribs)
+                my_list.append(dota2_item)
+
+            recipe_item = RecipeItem(data.get(item).get("dname"), data.get(item).get("cost"), False,
+                                     data.get(item).get("notes"), data.get(item).get("attrib"), my_list)
+            return recipe_item
+        else:
+            return None
+
+    # returns false if the item is a component of another item
+    # returns true if the item is not a component of another item
+    def isBaseItem(self, item: str, data: dict) -> bool:
+        item_list = data.keys()
+        for json_item in item_list:
+            if data.get(json_item).get("components") is not None:
+                if data.get(json_item).get("components").__contains__(item):
+                    print("original item [" + item + "] is a component of another item [" + json_item + "] "
+                          + "with components: " + str(data.get(json_item).get("components")))
+                    return False
+        return True
+
     def jsonOpener(self, filename: str) -> list:
         itemlist = []
         print("Started Reading JSON file which contains multiple JSON document")
@@ -154,20 +194,24 @@ class ItemsList:
                         else:
                             attribute_value = "empty"
                             attrib_array.append(attribute_value)
-                if item_components is None:
+
+                # check to see if item is a base item,
+                # if it is, create a Dota2Item object,
+                # if not, create a RecipeItem object
+                if self.isBaseItem(item, data):
+                    # print(item + " is a base item")
                     dota2_item = Dota2Item(name, item_cost, item_has_active_effect, item_notes, attrib_array)
                     self.validateDota2Item(dota2_item)
                     # can probably remove this
                     if item_cost != 0:
                         itemlist.append(dota2_item)
-                else:
-                    dota2_item = RecipeItem(name, item_cost, item_has_active_effect, item_notes, attrib_array,
-                                            item_components)
-                    self.validateDota2Item(dota2_item)
-                    # can probably remove this
-                    if item_cost != 0:
-                        itemlist.append(dota2_item)
 
+                    # print(item + " is a component of another item")
+                if item_components is not None:
+                    recipe_item = self.createRecipeItem(item, data)
+                    if recipe_item is not None:
+                        self.validateDota2Item(recipe_item)
+                        itemlist.append(self.createRecipeItem(item, data))
                 i = i + 1
         print("Finished Reading JSON file which contains multiple JSON document")
         return itemlist

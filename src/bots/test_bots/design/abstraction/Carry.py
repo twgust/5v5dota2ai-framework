@@ -36,6 +36,24 @@ class Carry(Role):
         items = [item for item in items if item.name not in [current_item.name for current_item in current_items]]
         return items
 
+    def buy_recipe_item(self, item: RecipeItem)-> None:
+        #components = item.get_required_items()
+        self.player_hero.buy("item_tango")
+        self.player_hero.buy("item_" + item.name)
+        print(item.name + "-item.name")
+        for items in self.player_hero.get_items():
+            print(items.get_name() + "-addon name")
+        if item.name in self.player_hero.get_items():
+            return
+        else:
+            for component in item.get_required_items():
+                print("item_" + str(component.get_cost()) + "??????????")
+                self.player_hero.buy("item_" + component)
+
+
+
+
+
     # WIP
     def buy_target_items(self) -> list[Dota2Item]:
         bought_items = []
@@ -60,6 +78,13 @@ class Carry(Role):
     def buy_items(self, role_name: str) -> list[Dota2Item]:
         # start gold
         gold = self.player_hero.get_gold()
+        recipe_item_list = self._my_items_list.getAllRecipeItems()
+        bracer_item = None
+        for items in recipe_item_list:
+            if items.name == "bracer":
+                bracer_item = items
+        if bracer_item is not None:
+            self.buy_recipe_item(bracer_item)
         # get items for the attribute we're focusing on building for
         items_attribute_list = self._my_items_list.get_attribute_list(self.get_attribute())
         # smart_buy is ON

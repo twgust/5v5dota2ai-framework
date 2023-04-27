@@ -34,7 +34,7 @@ test: dict[str, dict[str]] = {
     "npc_dota_hero_ember_spirit": {
         "agility"
     },
-    "npc_dota_hero_faceless_void": {
+    "npc_dota_hero_invoker": {
         "agility"
     },
     "npc_dota_hero_lich": {
@@ -53,7 +53,7 @@ party = {
         "npc_dota_hero_clinkz",
         "npc_dota_hero_drow_ranger",
         "npc_dota_hero_ember_spirit",
-        "npc_dota_hero_faceless_void",
+        "npc_dota_hero_invoker",
         "npc_dota_hero_lich",
     ],
 }
@@ -87,9 +87,12 @@ class SuperBot(BaseBot):
                 self._carries.append(my_hero)
 
     def actions(self, hero: PlayerHero, game_ticks: int):
-            carry_hero = self._carries_dict.get(hero.get_name())
+        for ability in hero.get_abilities():
+            print(ability.get_ability_index())
+            print(ability.get_name())
 
-            if carry_hero is not None and game_ticks % 15 == 0:
-                print("$$$ " + PlayerHero.get_name(hero) + " is buying items $$$")
-                carry_hero.buy_items("carry")
-            return
+        carry_hero = self._carries_dict.get(hero.get_name())
+        if carry_hero is not None and game_ticks % 15 == 0:
+            print("$$$ " + PlayerHero.get_name(hero) + " is buying items $$$")
+            carry_hero.buy_items("carry")
+        return
