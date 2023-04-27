@@ -15,17 +15,12 @@ class SniperMid(BaseHero):
     _world: World
     _party: list[str]
     _heroes: list[PlayerHero]
-    _items: list[str]
-    _skill_build: dict[int, str]
     _items = dict[int, str]
     _skill_build = dict[int, int]
-
 
     def __init__(self):
         self.initialise_items()
         self.initialise_skill_build()
-<<<<<<< Updated upstream
-=======
 
     def initialise_skill_build(self):
         self._skill_build = {
@@ -36,23 +31,13 @@ class SniperMid(BaseHero):
             21: 0, 22: 0, 23: 0, 24: 0, 25: 0,
             26: 0, 27: 0, 28: 0, 29: 0, 30: 0
         }
->>>>>>> Stashed changes
 
     def initialise_items(self) -> None:
         self._items = {1: 'power treads', 2: 'Maelstrom', 3: 'Dragon lance', 4: 'Mjolnir', 5: 'Daedalus',
                        6: 'Monkey king bar', 7: 'Butterfly'}
 
-    def initialise_skill_build(self):
-        """Initialise the skill build here
-        key = hero level, value = ability"""
-        self._skill_build = {1, 'Ability'}
-
     def get_move(self, hero: PlayerHero, game_ticks: int, world: World) -> None:
-<<<<<<< Updated upstream
         """Get a move generated from this specific hero, takes the hero object and current world object as parameter"""
-
-=======
->>>>>>> Stashed changes
         if world.get_team() == RADIANT_TEAM:
             hero.move(500, 500, 0)
             if not hero.is_alive():

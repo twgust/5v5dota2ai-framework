@@ -168,16 +168,7 @@ class TestHeroTeam(BaseBot):
             self._go_aggressive_step2 = True
 
     def actions(self, hero: PlayerHero, game_ticks: int) -> None:
-<<<<<<< Updated upstream
         """Start by implementing the general logic extending all bots"""
-        if not hero.is_alive():
-            if hero.get_buyback_cooldown_time() == 0 and hero.get_gold() >= hero.get_buyback_cost():
-                hero.buyback()
-                return
-            else:
-                hero.courier_move_to_position(*self._home_position)
-                return
-
         if hero.get_stash_items():
             print("Has stash items")
             for item in hero.get_stash_items():
@@ -186,13 +177,11 @@ class TestHeroTeam(BaseBot):
             return
 
         """Continue by calling individual hero logic"""
-=======
         """#Check which hero logic to call"""
         if game_ticks == 1:
             for ability in hero.get_abilities():
                 print(ability.get_ability_index())
                 print(ability.get_name())
->>>>>>> Stashed changes
         if hero.get_name() == "npc_dota_hero_sniper":
             self._sniper_obj.get_move(hero, game_ticks, self._world)
             return
