@@ -15,16 +15,19 @@ class SniperMid(BaseHero):
     _world: World
     _party: list[str]
     _heroes: list[PlayerHero]
+<<<<<<< HEAD
     _items: list[str]
     _skill_build: dict[int, str]
+=======
+    _items = dict[int, str]
+>>>>>>> 1e06b8ef734e7c3909613c2c10a2ee1032b608d9
 
     def __init__(self):
         self.initialise_items()
         self.initialise_skill_build()
 
     def initialise_items(self) -> None:
-        _items = ['Power treads', 'Maelstrom', 'Dragon lance', 'Mjolnir', 'Daedalus', 'Monkey king bar', 'Butterfly',
-                  'Eye of skadi']
+        self._items = {1: 'power treads', 2: 'Maelstrom', 3: 'Dragon lance', 4: 'Mjolnir', 5: 'Daedalus', 6: 'Monkey king bar', 7: 'Butterfly'}
 
     def initialise_skill_build(self):
         """Initialise the skill build here
@@ -32,7 +35,11 @@ class SniperMid(BaseHero):
         self._skill_build = {1, 'Ability'}
 
     def get_move(self, hero: PlayerHero, game_ticks: int, world: World) -> None:
+<<<<<<< HEAD
         """Get a move generated from this specific hero, takes the hero object and current world object as parameter"""
+=======
+
+>>>>>>> 1e06b8ef734e7c3909613c2c10a2ee1032b608d9
         if world.get_team() == RADIANT_TEAM:
             hero.move(500, 500, 0)
             if not hero.is_alive():
