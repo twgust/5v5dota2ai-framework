@@ -278,6 +278,21 @@ class PlayerHero(Hero):
             }
         }
 
+    def buy_combined(self, item_names: tuple) -> None:
+        """
+        Buy items by given `item_names`.
+
+        If all buy conditions are not met, the command will fail.
+
+        Will first attempt to buy item for hero, then attempt to buy for courier.
+        """
+        self._command = {
+            self.get_name(): {
+                "command": "BUY_COMBINED",
+                "item": item_names
+            }
+        }
+
     def sell(self, slot: int) -> None:
         """
         Sell item in given slot if possible.

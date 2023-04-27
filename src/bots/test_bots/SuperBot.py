@@ -89,6 +89,9 @@ class SuperBot(BaseBot):
     def actions(self, hero: PlayerHero, game_ticks: int):
         carry_hero = self._carries_dict.get(hero.get_name())
         if carry_hero is not None and game_ticks % 15 == 0:
+            # carry_hero.player_hero.buy("item_tango")
             print("$$$ " + PlayerHero.get_name(hero) + " is buying items $$$")
             carry_hero.buy_items("carry")
+            #print(carry_hero._my_items_list.get_item_dict().get("bracer").to_string())
+
         return

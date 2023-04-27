@@ -47,7 +47,8 @@ class Dota2Item:
 
     def get_attribute(self) -> list[str]: return self.attribute
 
-    def to_string(self) -> str: return self.name
+    def to_string(self) -> str: return "NAME: " + self.name + ", COST: " + str(self.cost) + ", ATTRIBUTES " + ", ".join([str(x) for x in self.attribute])
 
     def __eq__(self, other):
         return (self.name, self.cost) == (other.name, other.cost)
+

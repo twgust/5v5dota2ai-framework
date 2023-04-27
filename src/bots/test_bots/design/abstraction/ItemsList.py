@@ -7,6 +7,7 @@ from bots.test_bots.design.abstraction.RecipeItem import RecipeItem
 
 class ItemsList:
     _items_list: list[Dota2Item]
+    _items_dict: dict[str, Dota2Item]
     _items_list_passive: list[Dota2Item]
     _items_list_active: list[Dota2Item]
 
@@ -17,6 +18,7 @@ class ItemsList:
     _items_list_recipes: list[RecipeItem]
 
     def __init__(self):
+        self._items_dict = {}
         self.load_data()
         print("Ok")
 
@@ -96,6 +98,9 @@ class ItemsList:
             if not item.hasActiveEffect:
                 passive_items_list.append(item)
         return passive_items_list
+
+    def get_item_dict(self) -> dict[str, Dota2Item]:
+        return self._items_dict
 
     def getAllActiveItems(self) -> list[Dota2Item]:
         active_items_list = []
@@ -202,22 +207,23 @@ class ItemsList:
                 # if it is, create a Dota2Item object,
                 # if not, create a RecipeItem object
                 if self.isBaseItem(item, data):
-                    # print(item + " is a base item")
                     dota2_item = Dota2Item(name, item_cost, item_has_active_effect, item_notes, attrib_array)
                     self.validateDota2Item(dota2_item)
-                    # can probably remove this
-                    if item_cost != 0:
-                        itemlist.append(dota2_item)
+                    itemlist.append(dota2_item)
+                    self.add_to_dictionary(dota2_item)
 
-                    # print(item + " is a component of another item")
                 if item_components is not None:
                     recipe_item = self.createRecipeItem(item, data)
                     if recipe_item is not None:
                         self.validateDota2Item(recipe_item)
                         itemlist.append(self.createRecipeItem(item, data))
+                        self.add_to_dictionary(recipe_item)
                 i = i + 1
         print("Finished Reading JSON file which contains multiple JSON document")
         return itemlist
+
+    def add_to_dictionary(self, item: Dota2Item):
+        self._items_dict[item.name] = item
 
     @property
     def items_list_strength(self):
