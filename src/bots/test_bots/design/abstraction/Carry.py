@@ -37,49 +37,86 @@ class Carry(Role):
         return items
 
     def attempt_item_purchase(self, item: Dota2Item) -> bool:
+        """
+        Attempts to purchase a single item.
+
+        Parameters:
+        item (Dota2Item): The item to be purchased.
+
+        Returns:
+        bool: True if the purchase was successful, False otherwise.
+        """
         if self.player_hero.get_gold() > item.cost:
-            buy_item = "item_" + item.get_name()
-            self.debug_buying(item, "attempt_item_purchase")
-            print("ITEM PARAMETER (item.get_name): [" + item.get_name() + "], ACTUAL BUY STRING: [" + buy_item + "]")
-            self.player_hero.buy(buy_item)
+            self.player_hero.buy(item.name)
             return True
         else:
             print(item.name + " too expensive for ")
             return False
 
     def attempt_partial_item_purchase(self, item: RecipeItem) -> bool:
+        """
+        Attempts to purchase a partial item using its recipe.
+
+        Parameters:
+        item (RecipeItem): The recipe of the item to be purchased.
+
+        Returns:
+        bool: True if the purchase was successful, False otherwise.
+        """
         for component in item.get_required_items():
-            if component.name not in self.player_hero.get_items():
-                self.debug_buying(item, "attempt_partial_item_purchase")
+            # Original item class did not append item_ to the name,
+            # which is necessary when buying items
+            component.name = "item_" + component.name
+            if component.name not in [item.name for item in self.player_hero.get_items()]:
                 if self.attempt_item_purchase(component):
                     return True
-                else:
-                    return False
+        return False
+
+    def attempt_complete_item_purchase(self, item: RecipeItem) -> bool:
+        """
+        Attempts to purchase a complete item using its recipe.
+
+        Parameters:
+        item (RecipeItem): The recipe of the item to be purchased.
+
+        Returns:
+        bool: True if the purchase was successful, False otherwise.
+        """
+        components = self.generate_item_tuple(item)
+        if self.player_hero.get_gold() > item.cost:
+            self.debug_buying(item, "attempt_complete_item_purchase TRUE")
+            self.player_hero.buy_combined(list(components))
+            return True
+        else:
+            self.debug_buying(item, "attempt_complete_item_purchase FALSE")
+            return False
 
     def generate_item_tuple(self, item: RecipeItem) -> tuple:
         components = item.get_required_items()
-        item_names_tuple = tuple(item.name for item in components)
-        print("tuple: " + ", ".join([str(x) for x in item_names_tuple]))
-        testlist = ["item_circlet", "item_gauntlets", "item_recipe_bracer"]
-        self.player_hero.buy_combined(testlist)
-        return testlist
+        item_names_tuple = tuple(str("item_" + item.name) for item in components)
+        print(item_names_tuple)
+        return item_names_tuple
 
-    # returns true if complete item was bought,
-    # returns false if partial item or nothing was bought
     def buy_recipe_item(self, item: RecipeItem) -> bool:
-        #components = item.get_required_items()
-        self.generate_item_tuple(item)
-        self.debug_buying(item, "buy_recipe_item")
-        status = self.attempt_item_purchase(item)
-        if not status:
-            self.attempt_partial_item_purchase(item)
-            return status
-        elif status:
-            return status
+        """
+        This function attempts to buy a recipe item by first checking if the player can afford to buy the complete item
+        using `attempt_complete_item_purchase`, and if not, it attempts to buy the item's required components using
+        `attempt_partial_item_purchase`. If the purchase is successful, it returns `True`, else it returns `False`.
+
+        :param item: A `RecipeItem` object representing the item to be purchased.
+        :return: A boolean value indicating whether the purchase was successful.
+        """
+        # components = item.get_required_items()
+        buy_status = self.attempt_complete_item_purchase(item)
+        if not buy_status:
+            return self.attempt_partial_item_purchase(item)
+        elif buy_status:
+            return buy_status
 
     def debug_buying(self, item: Dota2Item, function_name: str):
-        print(self.player_hero.get_name() + " invoking -> " + function_name + " " + item.get_name() + " " + str(item.cost))
-
+        print(
+            self.player_hero.get_name() + "--DEBUG: invoking -> " + function_name + "() " + item.get_name() + " " + str(
+                item.cost))
 
     def buy_target_items(self) -> list[Dota2Item]:
         bought_items = []
@@ -90,6 +127,7 @@ class Carry(Role):
                 self._target_items.remove(target_item)
                 bought_items.append(target_item)
         return bought_items
+
     # WIP
 
     # WIP
@@ -101,23 +139,24 @@ class Carry(Role):
             self.player_hero.buy(buy_item)
             return max_cost_item
 
-    # returns the items that have so far been bought by a given hero
+    #WIP
     def buy_items(self, role_name: str) -> Any | None:
         # start gold
-        print(self.player_hero.get_name() + " INVENTORY: " + " ,".join([str(x.get_name()) for x in self.player_hero.get_items()]))
+        print(self.player_hero.get_name() + " INVENTORY: " + " ,".join(
+            [str(x.get_name()) for x in self.player_hero.get_items()]))
         circlet_item = Dota2Item("circlet", 155, False, None, ["strength", "agility", "intelligence"])
         gauntlets_item = Dota2Item("gauntlets", 140, False, None, ["strength"])
         recipe_bracer = Dota2Item("recipe_bracer", 210, False, None, None)
-        recipe_item = RecipeItem("bracer", 505, False, "The bracer is a common choice to toughen up defenses and increase longevity", None, [circlet_item, gauntlets_item, recipe_bracer])
-        self.generate_item_tuple(recipe_item)   #TEST
-        return                                  #TEST
-        if self.buy_recipe_item(recipe_item): #Test
+        recipe_item = RecipeItem("bracer", 505, False,
+                                 "The bracer is a common choice to toughen up defenses and increase longevity", None,
+                                 [circlet_item, gauntlets_item, recipe_bracer])
+        # self.generate_item_tuple(recipe_item)   #TEST
+        if self.buy_recipe_item(recipe_item):  # Test
             print("BUY_RECIPE_ITEM returns true")
             return True
         else:
             print("BUY_RECIPE_ITEM returns false")
             return False
-
 
         # get items for the attribute we're focusing on building for
         items_attribute_list = self._my_items_list.get_attribute_list(self.get_attribute())
