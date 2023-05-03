@@ -24,11 +24,11 @@ from typing import List
 # and Role (Carry, Support, etc.),
 # and Attribute (Strength, Agility, Intelligence)
 class Dota2Item:
-    def __init__(self, name: str, cost: int, has_active_effect: bool, active_effect: str,
+    def __init__(self, name: str, cost: int, hasActiveEffect: bool, active_effect: str,
                  attribute: list[str]) -> None:
         self.name = name
         self.cost = cost
-        self.hasActiveEffect = has_active_effect
+        self.is_active = hasActiveEffect
         self.activeEffect = active_effect
         self.role = self.determine_role()
         self.attribute = attribute
@@ -39,7 +39,7 @@ class Dota2Item:
 
     def get_cost(self) -> int: return self.cost
 
-    def has_active_effect(self) -> bool: return self.hasActiveEffect
+    def has_active_effect(self) -> bool: return self.has_active_effect
 
     def get_active_effect(self) -> str: return self.activeEffect
 

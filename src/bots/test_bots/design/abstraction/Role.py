@@ -9,18 +9,19 @@ class Role:
     item_blacklist = [
         "tango_single",
     ]
+
     # works
     def find_items_by_cost(self, gold: int, items: list[Dota2Item]) -> list[Dota2Item]:
         # Sort the items list based on cost using a lambda function
-        #self.validate_list_of_items(items)
+        # self.validate_list_of_items(items)
         items.sort(key=lambda item: item.cost)
         copy = items.copy()
         for item in items:
             if isinstance(item, RecipeItem) or "recipe" in item.name or item.cost == 0:
-                copy.remove(item)
+                print("ignore")
             for blacklisted_item in self.item_blacklist:
                 if blacklisted_item in item.name:
-                    copy.remove(item)
+                    print("ignore")
 
         # Perform binary search to find the first index i such that items[i].cost < gold
         lo, hi = 0, len(copy) - 1

@@ -7,7 +7,12 @@ from bots.test_bots.design.abstraction.RecipeItem import RecipeItem
 
 class ItemsList:
     _items_list: list[Dota2Item]
+
     _items_dict: dict[str, Dota2Item]
+
+    # K = item.name, V = recipeItem
+    _items_dict_recipe: dict[str, RecipeItem]
+
     _items_list_passive: list[Dota2Item]
     _items_list_active: list[Dota2Item]
 
@@ -19,6 +24,7 @@ class ItemsList:
 
     def __init__(self):
         self._items_dict = {}
+        self._items_dict_recipe = {}
         self.load_data()
         print("Ok")
 
@@ -95,17 +101,20 @@ class ItemsList:
     def getAllPassiveItems(self) -> list[Dota2Item]:
         passive_items_list = []
         for item in self._items_list:
-            if not item.hasActiveEffect:
+            if not item.has_active_effect():
                 passive_items_list.append(item)
         return passive_items_list
 
     def get_item_dict(self) -> dict[str, Dota2Item]:
         return self._items_dict
 
+    def get_recipe_item_dict(self) -> dict[str, RecipeItem]:
+        return self._items_dict_recipe
+
     def getAllActiveItems(self) -> list[Dota2Item]:
         active_items_list = []
         for item in self._items_list:
-            if item.hasActiveEffect:
+            if item.get_active_effect():
                 active_items_list.append(item)
         return active_items_list
 
@@ -122,36 +131,62 @@ class ItemsList:
             return item
 
     def createRecipeItem(self, item: str, data: dict) -> RecipeItem:
+        """
+        This function attempts to create a RecipeItem object from the given item name and data dictionary. If the
+        item is a recipe, it creates a RecipeItem object and returns it. If the item is not a recipe, it returns
+        None.
+        :param item: The name of the item to be created :param data: The data dictionary to be used to create
+        the item
+        :param data: The data dictionary to be used to create the item
+        :return: The created RecipeItem object or None
+        """
         item_components = data.get(item).get("components")
         print(item_components)
         item_cd = data.get(item).get("cd")
-        my_list = [Dota2Item]
-        for component in data.get(item).get("components"):
-            if component is not None:
-                temp_dota2_item_name = data.get(component).get("dname")
+        required_items_list = []
+        print("item: " + item)
+        for component in item_components:
+            if component is not None or component != "":
+                print("component: " + component)
+                temp_dota2_item_name = "item_" + component
                 temp_dota2_item_cost = data.get(component).get("cost")
-
                 if int(item_cd) <= 0:
                     temp_dota2_item_active_effect = False
                 else:
                     temp_dota2_item_active_effect = True
-                temp_dota2_item_notes = data.get(component).get("notes")
+                temp_dota2_item_notes = data.get(component).get("hint")
                 temp_dota2_item_attribs = data.get(component).get("attrib")
-
-                ##if self.isBaseItem(component, data):
                 dota2_item = Dota2Item(temp_dota2_item_name, temp_dota2_item_cost, temp_dota2_item_active_effect,
                                        temp_dota2_item_notes, temp_dota2_item_attribs)
-                my_list.append(dota2_item)
+                required_items_list.append(dota2_item)
 
-            recipe_item = RecipeItem(data.get(item).get("dname"), data.get(item).get("cost"), False,
-                                     data.get(item).get("notes"), data.get(item).get("attrib"), my_list)
-            return recipe_item
-        else:
-            return None
+        recipe = self.find_recipe_for_item(item, data)
+        if recipe is not None:
+            required_items_list.append(recipe)
+        recipe_item = RecipeItem(str("item_" + item), data.get(item).get("cost"), False,
+                                 data.get(item).get("hint"), data.get(item).get("attrib"), required_items_list)
+        return recipe_item
 
-    # returns false if the item is a component of another item
+    def find_recipe_for_item(self, item: str, data: dict) -> Dota2Item | None:
+        """
+        This function searches for a recipe of a given item within the data dictionary. If it
+        finds one, it returns the recipe as a dota 2 item. If it does not find one, it returns None.
+        Necessary because recipe_bracer is not in the components list of bracer in items.json...
+        """
+        recipe_item = None
+        for json_item in data.keys():
+            if json_item == "recipe_" + item:
+                return Dota2Item(str("item_recipe_" + item), data.get(json_item).get("cost"), False, None, None)
+        return None
+
+        # returns false if the item is a component of another item
+
     # returns true if the item is not a component of another item
     def isBaseItem(self, item: str, data: dict) -> bool:
+        """
+        This function checks if the given item is a component of another item. If it is, it returns false. If it is
+        not, it returns true.
+        """
         item_list = data.keys()
         # iterate over all the entries in the json file
         for json_item in item_list:
@@ -165,6 +200,11 @@ class ItemsList:
         return True
 
     def jsonOpener(self, filename: str) -> list:
+        """
+        This function opens a json file of dota 2 items and returns a list of the items in the file.
+        :param filename: The name of the file to be opened
+        :return: A list of the items in the file
+        """
         itemlist = []
         print("Started Reading JSON file which contains multiple JSON document")
         with open(filename, 'r') as f:
@@ -175,6 +215,7 @@ class ItemsList:
             i: int = 0
             for item in list_of_items:
                 name = myList.__getitem__(i)
+                name = "item_" + name
                 item_name = data.get(item).get("dname")
                 item_cd = data.get(item).get("cd")
                 item_notes = data.get(item).get("notes")
@@ -218,6 +259,7 @@ class ItemsList:
                         self.validateDota2Item(recipe_item)
                         itemlist.append(self.createRecipeItem(item, data))
                         self.add_to_dictionary(recipe_item)
+                        self._items_dict_recipe[recipe_item.name] = recipe_item
                 i = i + 1
         print("Finished Reading JSON file which contains multiple JSON document")
         return itemlist
