@@ -2,6 +2,8 @@
 
 dota_launch_custom_game dota2ai dota
 
+Update items.json from https://github.com/odota/dotaconstants/blob/master/build/items.json
+
 ## About
 
 This is a DotA 2 bot framework intended and needed to be run with the updated [DoTa 2 ADDON dota2ai](https://github.com/ellakk/5v5dota2ai-addon).
