@@ -50,6 +50,8 @@ class SniperMid(BaseHero):
                 assert hero.get_buyback_cooldown_time() == 0
         if self.level_up_ability(hero):
             return
+        if self.cast_ability(hero, world):
+            return
         if hero.get_gold() > 505:
             return
         if self._shared_functions.attack_enemy_hero(hero, self._world):
