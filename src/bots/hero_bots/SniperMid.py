@@ -70,6 +70,7 @@ class SniperMid(BaseHero):
     def cast_ability(self, hero: PlayerHero, world: World) -> bool:
         """Cast an ability generated from this specific hero, takes the hero object and current world object as parameter"""
         enemy_hero = self._shared_functions.get_enemy_hero_to_attack(hero, world)
+        # Assassinate
         ability = hero.get_abilities()[5]
         if enemy_hero is not None:
             if ability.get_cooldown_time_remaining() == 0:
@@ -77,3 +78,17 @@ class SniperMid(BaseHero):
                     if enemy_hero.get_health() < ability.get_ability_damage():
                         hero.cast_target_unit(5, enemy_hero)
                         return True
+            # Take aim
+            ability = hero.get_abilities()[2]
+            if ability.get_cooldown_time_remaining() == 0:
+                if hero.get_mana() > ability.get_mana_cost():
+                    hero.cast_no_target(2)
+                    return True
+        # Shrapnel
+        ability = hero.get_abilities()[0]
+        if len(self._shared_functions.get_closest_enemy_creeps(hero, world)) >= 4:
+            if ability.get_cooldown_time_remaining() == 0:
+                if hero.get_mana() > ability.get_mana_cost():
+                    hero.cast_target_area(0, self._shared_functions.get_closest_enemy_creeps(hero, world)[0].get_position())
+                    return True
+
