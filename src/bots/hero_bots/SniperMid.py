@@ -1,4 +1,5 @@
 from bots.hero_bots.BaseHero import BaseHero
+from bots.hero_bots.SharedFunctions import SharedFunctions
 from bots.test_bots import TestHeroTeam
 from game.player_hero import PlayerHero
 from game.world import World
@@ -17,6 +18,7 @@ class SniperMid(BaseHero):
     _heroes: list[PlayerHero]
     _items = dict[int, str]
     _skill_build = dict[int, int]
+    _shared_functions = SharedFunctions()
 
     def __init__(self):
         self.initialise_items()
@@ -38,6 +40,8 @@ class SniperMid(BaseHero):
 
     def get_move(self, hero: PlayerHero, game_ticks: int, world: World) -> None:
         """Get a move generated from this specific hero, takes the hero object and current world object as parameter"""
+        # for v in hero.get_abilities():
+        #   print(v.get_name(), v.get_ability_index(), v.get_ability_damage())
         if world.get_team() == RADIANT_TEAM:
             hero.move(500, 500, 0)
             if not hero.is_alive():
@@ -48,9 +52,26 @@ class SniperMid(BaseHero):
             return
         if hero.get_gold() > 505:
             return
+        if self._shared_functions.attack_enemy_hero(hero, self._world):
+            return
+        if self._shared_functions.last_hit_creep(hero, self._world):
+            return
+        if self._shared_functions.deny_creep(hero, self._world):
+            return
 
     def level_up_ability(self, hero: PlayerHero) -> bool:
         if hero.get_ability_points() > 0:
             hero.level_up(self._skill_build.get(hero.get_level()))
             return True
         return False
+
+    def cast_ability(self, hero: PlayerHero, world: World) -> bool:
+        """Cast an ability generated from this specific hero, takes the hero object and current world object as parameter"""
+        enemy_hero = self._shared_functions.get_enemy_hero_to_attack(hero, world)
+        ability = hero.get_abilities()[5]
+        if enemy_hero is not None:
+            if ability.get_cooldown_time_remaining() == 0:
+                if hero.get_mana() > ability.get_mana_cost():
+                    if enemy_hero.get_health() < ability.get_ability_damage():
+                        hero.cast_target_unit(5, enemy_hero)
+                        return True
