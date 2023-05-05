@@ -141,13 +141,11 @@ class ItemsList:
         :return: The created RecipeItem object or None
         """
         item_components = data.get(item).get("components")
-        print(item_components)
+        print("Creating item:" + item + ", components: " + str(item_components))
         item_cd = data.get(item).get("cd")
         required_items_list = []
-        print("item: " + item)
         for component in item_components:
             if component is not None or component != "":
-                print("component: " + component)
                 temp_dota2_item_name = "item_" + component
                 temp_dota2_item_cost = data.get(component).get("cost")
                 if int(item_cd) <= 0:
@@ -261,7 +259,7 @@ class ItemsList:
                         self.add_to_dictionary(recipe_item)
                         self._items_dict_recipe[recipe_item.name] = recipe_item
                 i = i + 1
-        print("Finished Reading JSON file which contains multiple JSON document")
+        print("JSON: EOF")
         return itemlist
 
     def add_to_dictionary(self, item: Dota2Item):

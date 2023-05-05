@@ -1,6 +1,7 @@
 from typing import Literal, TypedDict, Union, cast
 from game.hero import Hero
 from game.player_hero import PlayerHero
+from game.position import Position
 from game.unit import Unit
 from game.world import World
 
@@ -13,6 +14,34 @@ from game.world import World
 class SharedFunctions:
     def __init__(self):
         pass
+
+    def distance_to(self, hero_position: Position, other: Position) -> float:
+        return ((hero_position.x - other.x) ** 2 + (hero_position.y - other.y) ** 2 + (
+                    hero_position.z - other.z) ** 2) ** 0.5
+
+    def closest_friendly_tower(self, hero, world) -> Position | None:
+        friendly_towers = world.get_allied_towers_of(hero)
+        closest_tower = None
+        closest_distance = float('inf')
+
+        for tower in friendly_towers:
+            tower_position = tower.get_position()
+            distance_to_tower = self.distance_to(hero.get_position(), tower_position)
+            if distance_to_tower < closest_distance:
+                closest_tower = tower_position
+                closest_distance = distance_to_tower
+        return closest_tower
+
+    def attacked_by_tower(self, hero, world) -> bool:
+        towers = world.get_enemy_towers_of(hero)
+        for tower in towers:
+            entity = world.get_entity_by_id(tower.get_attack_target())
+            if isinstance(entity, PlayerHero):
+                if entity.__eq__(hero):
+                    print(entity.get_name())
+                    return True
+                else:
+                    return False
 
     def attack_enemy_hero(self, hero: PlayerHero, world: World) -> bool:
         enemy_hero_to_attack = self.get_enemy_hero_to_attack(hero, world)

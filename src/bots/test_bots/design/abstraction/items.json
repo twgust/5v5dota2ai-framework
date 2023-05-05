@@ -4128,8 +4128,7 @@
     "components": [
       "kaya",
       "sange",
-      "yasha",
-      ""
+      "yasha"
     ],
     "created": true,
     "charges": false
@@ -7879,8 +7878,7 @@
     "lore": "One of the few surviving creations of the acolytes of the Wyrmforge.",
     "components": [
       "blink",
-      "meteor_hammer",
-      ""
+      "meteor_hammer"
     ],
     "created": true,
     "charges": false,
