@@ -62,11 +62,13 @@ class SniperMid(BaseHero):
         # for v in hero.get_abilities():
         #   print(v.get_name(), v.get_ability_index(), v.get_ability_damage())
         if world.get_team() == RADIANT_TEAM:
-            hero.move(500, 500, 0)
+            cord = self._shared_functions.get_pushing_creeps_for_lane_pos(hero, world, "mid")
+            hero.move(cord.x, cord.y, cord.z)
             if not hero.is_alive():
                 hero.buyback()
             else:
                 assert hero.get_buyback_cooldown_time() == 0
+            return
         # if self.level_up_ability(hero):
         #   return
         #   if self.cast_ability(hero, world):
@@ -84,6 +86,7 @@ class SniperMid(BaseHero):
         if self._shared_functions.attack_enemy_hero(hero, world):
             if self._shared_functions.attacked_by_tower(hero, world):
                 pos = self._shared_functions.closest_friendly_tower(hero, world)
+                # overwrite attack commando
                 hero.move(pos.x, pos.y, pos.z)
             return
         if self._shared_functions.last_hit_creep(hero, world):

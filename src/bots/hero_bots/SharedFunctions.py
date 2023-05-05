@@ -15,9 +15,30 @@ class SharedFunctions:
     def __init__(self):
         pass
 
+    def get_closest_enemy_tower_for_lane(self, hero: Hero, world: World, target_lane: str) -> Position:
+        if target_lane == "mid":
+            enemy_towers = world.get_enemy_towers_of(hero)
+            for tower in enemy_towers:
+                if "mid" in tower.get_name():
+                    return tower.get_position()
+
+    def get_pushing_creeps_for_lane_pos(self, hero: Hero, world: World, target_lane: str):
+        friendly_creeps = world.get_allied_creeps_of(hero)
+        closest_creep = None
+        closest_distance = float('inf')
+        closest_enemy_tower_mid = self.get_closest_enemy_tower_for_lane(hero, world, target_lane)
+        for creep in friendly_creeps:
+            creep_position = creep.get_position()
+            if creep_position:
+                distance_to_creep = world.get_distance_between_positions(closest_enemy_tower_mid, creep_position)
+                if distance_to_creep < closest_distance:
+                    closest_creep = creep_position
+                    closest_distance = distance_to_creep
+        return closest_creep
+
     def distance_to(self, hero_position: Position, other: Position) -> float:
         return ((hero_position.x - other.x) ** 2 + (hero_position.y - other.y) ** 2 + (
-                    hero_position.z - other.z) ** 2) ** 0.5
+                hero_position.z - other.z) ** 2) ** 0.5
 
     def closest_friendly_tower(self, hero, world) -> Position | None:
         friendly_towers = world.get_allied_towers_of(hero)
