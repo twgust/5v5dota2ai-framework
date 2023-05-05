@@ -42,6 +42,16 @@ class SharedFunctions:
 
         return close_enemy_heroes
 
+    def get_enemy_heroes_within_specific_range(self, hero: PlayerHero, world: World, range: int) -> list[Unit]:
+        enemy_heroes: list[Unit] = world.get_enemy_heroes_of(hero)
+        units_within_range: list[Unit] = []
+
+        for enemy_hero in enemy_heroes:
+            if world.get_distance_between_units(hero, enemy_hero) < range:
+                units_within_range.append(enemy_hero)
+
+        return units_within_range
+
     def last_hit_creep(self, hero: PlayerHero, world: World) -> bool:
         creep_to_last_hit: Union[Unit, None] = self.get_creep_to_last_hit(hero, world)
 
