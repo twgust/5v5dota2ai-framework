@@ -74,22 +74,25 @@ class SniperMid(BaseHero):
         # Assassinate anyone
         enemy_heroes = self._shared_functions.get_enemy_heroes_within_specific_range(hero, world, 3000)
         if len(enemy_heroes) > 0:
-            if ability.get_cooldown_time_remaining() == 0:
-                if hero.get_mana() > ability.get_mana_cost():
-                    hero.cast_target_unit(5, enemy_heroes[0])
-                    return True
+            if ability.get_level() > 0:
+                if ability.get_cooldown_time_remaining() == 0:
+                    if hero.get_mana() > ability.get_mana_cost():
+                        hero.cast_target_unit(5, enemy_heroes[0])
+                        return True
             # Take aim
             ability = hero.get_abilities()[2]
-            if ability.get_cooldown_time_remaining() == 0:
-                if hero.get_mana() > ability.get_mana_cost():
-                    hero.cast_no_target(2)
-                    return True
+            if ability.get_level() > 0:
+                if ability.get_cooldown_time_remaining() == 0:
+                    if hero.get_mana() > ability.get_mana_cost():
+                        hero.cast_no_target(2)
+                        return True
         # Shrapnel
         ability = hero.get_abilities()[0]
         closest_enemy_creeps = self._shared_functions.get_closest_enemy_creeps(hero, world)
         if len(closest_enemy_creeps) >= 4:
-            if ability.get_cooldown_time_remaining() == 0:
-                if hero.get_mana() > ability.get_mana_cost():
-                    hero.cast_target_area(0, closest_enemy_creeps[0].get_position())
-                    return True
+            if ability.get_level() > 0:
+                if ability.get_cooldown_time_remaining() == 0:
+                    if hero.get_mana() > ability.get_mana_cost():
+                        hero.cast_target_area(0, closest_enemy_creeps[0].get_position())
+                        return True
 

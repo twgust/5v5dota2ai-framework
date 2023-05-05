@@ -13,6 +13,7 @@ from game.world import World
 class SharedFunctions:
     def __init__(self):
         pass
+
     def attack_enemy_hero(self, hero: PlayerHero, world: World) -> bool:
         enemy_hero_to_attack = self.get_enemy_hero_to_attack(hero, world)
         if enemy_hero_to_attack is not None:
