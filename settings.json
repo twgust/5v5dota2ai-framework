@@ -1,7 +1,7 @@
 {
   "base_dir_bots": "bots/test_bots/",
-  "radiant_bot_filename": "TestHeroTeam.py",
-  "radiant_bot_class_name": "TestHeroTeam",
+  "radiant_bot_filename": "TestBotBasicSmart.py",
+  "radiant_bot_class_name": "TestBotBasicSmart",
   "dire_bot_filename": "TestBotBasicSmart.py",
   "dire_bot_class_name": "TestBotBasicSmart",
   "native_bots_difficulty": "easy",
