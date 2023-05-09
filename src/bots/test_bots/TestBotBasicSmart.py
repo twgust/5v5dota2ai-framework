@@ -1,4 +1,6 @@
 from typing import Literal, TypedDict, Union, cast
+from bots.hero_bots.SharedFunctions import SharedFunctions
+from game.building import Building
 from game.physical_entity import PhysicalEntity
 from game.rune import Rune
 from game.enums.ability_behavior import AbilityBehavior
@@ -19,10 +21,10 @@ TOP: int = 0
 MID: int = 1
 BOT: int = 2
 
+
 class HeroData(TypedDict):
     boots: Union[Literal[0], Literal[1]]
     lane: Union[Literal[0], Literal[1], Literal[2]]
-
 
 
 party: dict[int, dict[str, HeroData]] = {
@@ -82,6 +84,7 @@ secret_shop_position = {
     DIRE_TEAM: Position(4875, -1286, 256),
 }
 
+
 class TestBotBasicSmart(BaseBot):
     '''
     Tests:
@@ -101,7 +104,7 @@ class TestBotBasicSmart(BaseBot):
     - Other heroes will buy blades of attack and chainmail using courier which delivers it to the hero to create phase boots.
     - Heroes with phase boots will use them whenever possible.
     '''
-    
+
     _world: World
     _party: list[str]
     _heroes: list[PlayerHero]
@@ -113,6 +116,7 @@ class TestBotBasicSmart(BaseBot):
     _courier_transferring_items: dict[str, bool]
     _go_aggressive_step1: bool
     _go_aggressive_step2: bool
+    _shared_functions: SharedFunctions = SharedFunctions()
 
     def __init__(self, world: World) -> None:
         team: int = world.get_team()
@@ -174,12 +178,9 @@ class TestBotBasicSmart(BaseBot):
             self._go_aggressive_step2 = True
 
     def actions(self, hero: PlayerHero, game_ticks: int) -> None:
-        if not hero.is_alive():
+        if not hero.is_alive():  # This seems to be broken as it gets stuck as false after dying randomly
             if hero.get_buyback_cooldown_time() == 0 and hero.get_gold() >= hero.get_buyback_cost():
                 hero.buyback()
-                return
-            else:
-                hero.courier_move_to_position(*self._home_position)
                 return
 
         if hero.get_stash_items():
@@ -210,7 +211,7 @@ class TestBotBasicSmart(BaseBot):
 
         if self.get_better_boots(hero):
             return
-        
+
         if self.use_arcane_boots(hero):
             return
 
@@ -218,8 +219,6 @@ class TestBotBasicSmart(BaseBot):
             return
 
         self.make_choice(hero)
-
-
 
     def buy_tp_scroll(self, hero: PlayerHero) -> bool:
         if hero.get_gold() >= 100 and hero.is_in_range_of_home_shop() and hero.get_tp_scroll_charges() < 2:
@@ -232,8 +231,8 @@ class TestBotBasicSmart(BaseBot):
         runes: list[Rune] = self._world.get_runes()
 
         if self.hero_name_match_any(hero, ["pugna"]) \
-        and bottle_slot != -1\
-        and runes:
+                and bottle_slot != -1 \
+                and runes:
             hero.pick_up_rune(runes[0])
             return True
 
@@ -243,7 +242,7 @@ class TestBotBasicSmart(BaseBot):
         bottle_slot: int = self.get_item_slot_by_name(hero, "item_bottle")
 
         if self.hero_name_match_any(hero, ["pugna"]) \
-        and bottle_slot == -1:
+                and bottle_slot == -1:
             courier: Union[PhysicalEntity, None] = self._world.get_entity_by_id(hero.get_courier_id())
             if isinstance(courier, Courier):
                 if self.courier_has_bottle(courier):
@@ -253,7 +252,7 @@ class TestBotBasicSmart(BaseBot):
                         self._courier_transferring_items[hero.get_name()] = True
                         hero.courier_transfer_items()
                         return True
-                
+
                 elif hero.get_gold() >= 675:
                     hero.buy("item_bottle")
                     return True
@@ -264,7 +263,7 @@ class TestBotBasicSmart(BaseBot):
         for item in courier.get_items():
             if item.get_name() == "item_bottle":
                 return True
-        
+
         return False
 
     def place_observer_ward(self, hero: PlayerHero) -> bool:
@@ -296,13 +295,11 @@ class TestBotBasicSmart(BaseBot):
     def hero_name_match_any(self, hero: PlayerHero, matches: list[str]) -> bool:
         return hero.get_name() in ["npc_dota_hero_" + match for match in matches]
 
-
-
     def get_top_push_tower_name(self) -> str:
         if self._world.get_team() == RADIANT_TEAM:
             if self._world.get_unit_by_name("dota_goodguys_tower1_top") is not None:
                 return "dota_goodguys_tower1_top"
-            
+
             if self._world.get_unit_by_name("dota_goodguys_tower2_top") is not None:
                 return "dota_goodguys_tower2_top"
 
@@ -310,7 +307,7 @@ class TestBotBasicSmart(BaseBot):
         else:
             if self._world.get_unit_by_name("dota_badguys_tower1_top") is not None:
                 return "dota_badguys_tower1_top"
-            
+
             if self._world.get_unit_by_name("dota_badguys_tower2_top") is not None:
                 return "dota_badguys_tower2_top"
 
@@ -320,7 +317,7 @@ class TestBotBasicSmart(BaseBot):
         if self._world.get_team() == RADIANT_TEAM:
             if self._world.get_unit_by_name("dota_goodguys_tower1_mid") is not None:
                 return "dota_goodguys_tower1_mid"
-            
+
             if self._world.get_unit_by_name("dota_goodguys_tower2_mid") is not None:
                 return "dota_goodguys_tower2_mid"
 
@@ -328,7 +325,7 @@ class TestBotBasicSmart(BaseBot):
         else:
             if self._world.get_unit_by_name("dota_badguys_tower1_mid") is not None:
                 return "dota_badguys_tower1_mid"
-            
+
             if self._world.get_unit_by_name("dota_badguys_tower2_mid") is not None:
                 return "dota_badguys_tower2_mid"
 
@@ -338,7 +335,7 @@ class TestBotBasicSmart(BaseBot):
         if self._world.get_team() == RADIANT_TEAM:
             if self._world.get_unit_by_name("dota_goodguys_tower1_bot") is not None:
                 return "dota_goodguys_tower1_bot"
-            
+
             if self._world.get_unit_by_name("dota_goodguys_tower2_bot") is not None:
                 return "dota_goodguys_tower2_bot"
 
@@ -346,7 +343,7 @@ class TestBotBasicSmart(BaseBot):
         else:
             if self._world.get_unit_by_name("dota_badguys_tower1_bot") is not None:
                 return "dota_badguys_tower1_bot"
-            
+
             if self._world.get_unit_by_name("dota_badguys_tower2_bot") is not None:
                 return "dota_badguys_tower2_bot"
 
@@ -372,7 +369,7 @@ class TestBotBasicSmart(BaseBot):
 
             for ability in hero.get_abilities():
                 if ability.get_level() < ability.get_max_level() \
-                and hero.get_level() >= ability.get_hero_level_required_to_level_up():
+                        and hero.get_level() >= ability.get_hero_level_required_to_level_up():
                     hero.level_up(ability.get_ability_index())
                     return True
 
@@ -382,8 +379,8 @@ class TestBotBasicSmart(BaseBot):
         for ability in hero.get_abilities():
             level_required = ability.get_hero_level_required_to_level_up()
             if (level_required == 6 or level_required == 12 or level_required == 18) \
-            and ability.get_level() < ability.get_max_level() \
-            and hero.get_level() >= level_required:
+                    and ability.get_level() < ability.get_max_level() \
+                    and hero.get_level() >= level_required:
                 hero.level_up(ability.get_ability_index())
                 return True
 
@@ -391,10 +388,10 @@ class TestBotBasicSmart(BaseBot):
 
     def use_arcane_boots(self, hero: PlayerHero) -> bool:
         if self.has_arcane_boots(hero) \
-        and hero.get_max_mana() - hero.get_mana() >= 175:
+                and hero.get_max_mana() - hero.get_mana() >= 175:
             for item in hero.get_items():
                 if item.get_name() == "item_arcane_boots" \
-                and item.get_cooldown_time_remaining() == 0:
+                        and item.get_cooldown_time_remaining() == 0:
                     hero.use_item(item.get_slot())
                     return True
 
@@ -404,7 +401,7 @@ class TestBotBasicSmart(BaseBot):
         if self.has_phase_boots(hero):
             for item in hero.get_items():
                 if item.get_name() == "item_phase_boots" \
-                and item.get_cooldown_time_remaining() == 0:
+                        and item.get_cooldown_time_remaining() == 0:
                     hero.use_item(item.get_slot())
                     return True
 
@@ -421,7 +418,7 @@ class TestBotBasicSmart(BaseBot):
         if boots_to_get == ARCANE:
             if self.has_boots(hero):
                 return self.get_arcane_boots(hero)
-        
+
         if boots_to_get == PHASE:
             if self.has_boots(hero):
                 return self.get_phase_boots(hero)
@@ -431,8 +428,9 @@ class TestBotBasicSmart(BaseBot):
     def get_arcane_boots(self, hero: PlayerHero) -> bool:
         if not self.courier_has_energy_booster(hero) and hero.get_gold() < 800 or self.courier_is_dead(hero):
             return False
-        
-        if not self.courier_has_energy_booster(hero) and self._world.get_distance_between_positions(self.get_courier_position(hero), self._secret_shop_position) < 500:
+
+        if not self.courier_has_energy_booster(hero) and self._world.get_distance_between_positions(
+                self.get_courier_position(hero), self._secret_shop_position) < 500:
             hero.buy("item_energy_booster")
             return True
 
@@ -461,7 +459,8 @@ class TestBotBasicSmart(BaseBot):
             hero.buy("item_chainmail")
             return True
 
-        if self.courier_has_blades_of_attack(hero) and self.courier_has_chainmail(hero) and not self._courier_transferring_items[hero.get_name()]:
+        if self.courier_has_blades_of_attack(hero) and self.courier_has_chainmail(hero) and not \
+        self._courier_transferring_items[hero.get_name()]:
             hero.courier_transfer_items()
             self._courier_transferring_items[hero.get_name()] = True
             return True
@@ -525,7 +524,7 @@ class TestBotBasicSmart(BaseBot):
                     return True
             hero.move(*self._home_position)
             return True
-        
+
         return False
 
     def push_lane(self, hero: PlayerHero, lane_tower_name: str) -> None:
@@ -537,9 +536,10 @@ class TestBotBasicSmart(BaseBot):
         if self.is_near_allied_creeps(hero) and not hero.get_has_tower_aggro():
             enemy_hero_to_attack: Union[Hero, None] = self.get_enemy_hero_to_attack(hero)
             closest_enemy: Union[Unit, None] = self.get_closest_enemy(hero)
+            closest_enemy_building: Union[Building, None] = self._shared_functions.get_closest_entity(hero, self._world, "enemy_tower")
 
-            if enemy_hero_to_attack is not None\
-            and self.should_attack_hero(hero, enemy_hero_to_attack):
+            if enemy_hero_to_attack is not None \
+                    and self.should_attack_hero(hero, enemy_hero_to_attack):
                 self.attack_enemy_hero(hero, enemy_hero_to_attack)
                 return
 
@@ -561,9 +561,13 @@ class TestBotBasicSmart(BaseBot):
             elif enemy_hero_to_attack is not None:
                 hero.attack(enemy_hero_to_attack)
 
-            elif self.should_move_closer_to_allied_creeps(hero):
+            elif self.should_move_closer_to_allied_creeps(hero) \
+                    and not self.get_closest_allied_creep(hero).get_name() == "npc_dota_base_blocker": # Added because the base blocker is treated as a creep which makes heroes get stuck on it.
                 self.follow(hero, self.get_closest_allied_creep(hero))
-                
+
+            elif closest_enemy_building is not None:
+                hero.attack(closest_enemy_building.get_position())
+
             else:
                 hero.stop()
         else:
@@ -603,7 +607,7 @@ class TestBotBasicSmart(BaseBot):
 
     def last_hit_creep(self, hero: PlayerHero) -> bool:
         creep_to_last_hit: Union[Unit, None] = self.get_creep_to_last_hit(hero)
-        
+
         if creep_to_last_hit is not None:
             hero.attack(creep_to_last_hit)
             return True
@@ -616,7 +620,7 @@ class TestBotBasicSmart(BaseBot):
         if creep_to_deny is not None:
             hero.attack(creep_to_deny)
             return True
-        
+
         return False
 
     def get_distance_to_home(self, hero: PlayerHero) -> float:
@@ -625,15 +629,15 @@ class TestBotBasicSmart(BaseBot):
     def should_move_home(self, hero: PlayerHero, new_value: Union[bool, None] = None) -> Union[bool, None]:
         if new_value is None:
             return self._should_move_home[hero.get_name()]
-        
+
         self._should_move_home[hero.get_name()] = new_value
 
     def should_attack_hero(self, hero: PlayerHero, enemy_hero_to_attack: Hero) -> bool:
         # todo check ability cooldowns & level
-        return self.get_unit_hp_percentage(enemy_hero_to_attack) < 65 or\
-                self.get_unit_mana_percentage(hero) > 95 or\
-                (self._go_aggressive_step1 and self.get_unit_mana_percentage(hero) > 80) or\
-                (self._go_aggressive_step2 and self.get_unit_mana_percentage(hero) > 70)
+        return self.get_unit_hp_percentage(enemy_hero_to_attack) < 65 or \
+            self.get_unit_mana_percentage(hero) > 95 or \
+            (self._go_aggressive_step1 and self.get_unit_mana_percentage(hero) > 80) or \
+            (self._go_aggressive_step2 and self.get_unit_mana_percentage(hero) > 70)
 
     def get_unit_hp_percentage(self, unit: Unit) -> float:
         '''Returns value in range 0-100.'''
@@ -651,15 +655,15 @@ class TestBotBasicSmart(BaseBot):
             ability: Ability = hero.get_abilities()[i]
             behavior: int = ability.get_behavior()
             if ability.get_level() > 0 \
-            and ability.get_cooldown_time_remaining() == 0 \
-            and (
-                behavior & AbilityBehavior.UNIT_TARGET.value or\
-                behavior & AbilityBehavior.NO_TARGET.value or\
-                behavior & AbilityBehavior.AOE.value or\
-                behavior & AbilityBehavior.POINT.value or\
-                behavior & AbilityBehavior.CHANNELLED.value
+                    and ability.get_cooldown_time_remaining() == 0 \
+                    and (
+                    behavior & AbilityBehavior.UNIT_TARGET.value or \
+                    behavior & AbilityBehavior.NO_TARGET.value or \
+                    behavior & AbilityBehavior.AOE.value or \
+                    behavior & AbilityBehavior.POINT.value or \
+                    behavior & AbilityBehavior.CHANNELLED.value
             ) \
-            and ability.get_mana_cost() <= hero.get_mana():
+                    and ability.get_mana_cost() <= hero.get_mana():
                 return ability
 
     def should_move_closer_to_allied_creeps(self, hero: PlayerHero) -> bool:
@@ -695,7 +699,7 @@ class TestBotBasicSmart(BaseBot):
             return
 
         return min(heroes_with_hp.keys(), key=(lambda enemy_hero: heroes_with_hp[enemy_hero]))
-        
+
     def get_closest_enemy_heroes(self, hero: PlayerHero) -> list[Hero]:
         enemy_heroes: list[Hero] = self._world.get_enemy_heroes_of(hero)
         close_enemy_heroes: list[Hero] = []
@@ -723,20 +727,23 @@ class TestBotBasicSmart(BaseBot):
         return False
 
     def get_closest_enemy(self, hero: PlayerHero) -> Union[Unit, None]:
-        enemies: list[Unit] = self.get_closest_enemy_creeps(hero) + cast(list[Unit], self.get_closest_enemy_heroes(hero))
+        enemies: list[Unit] = self.get_closest_enemy_creeps(hero) + cast(list[Unit],
+                                                                         self.get_closest_enemy_heroes(hero))
         enemies_with_distance_to_hero: dict[Unit, float] = {}
 
         for enemy in enemies:
             enemies_with_distance_to_hero[enemy] = self._world.get_distance_between_units(hero, enemy)
 
-        return min(enemies_with_distance_to_hero.keys(), key=(lambda allied_creep: enemies_with_distance_to_hero[allied_creep]), default=None)
+        return min(enemies_with_distance_to_hero.keys(),
+                   key=(lambda allied_creep: enemies_with_distance_to_hero[allied_creep]), default=None)
 
     def get_closest_enemy_creeps(self, hero: PlayerHero) -> list[Unit]:
         creeps: list[Unit] = self._world.get_enemy_creeps_of(hero)
         close_enemy_creeps: list[Unit] = []
 
         for creep in creeps:
-            if self._world.get_distance_between_units(hero, creep) < 500 or self._world.get_distance_between_units(hero, creep) < hero.get_attack_range():
+            if self._world.get_distance_between_units(hero, creep) < 500 or self._world.get_distance_between_units(hero,
+                                                                                                                   creep) < hero.get_attack_range():
                 close_enemy_creeps.append(creep)
 
         return close_enemy_creeps
@@ -750,4 +757,5 @@ class TestBotBasicSmart(BaseBot):
                 continue
             creeps_with_distance_to_hero[allied_creep] = self._world.get_distance_between_units(hero, allied_creep)
 
-        return min(creeps_with_distance_to_hero.keys(), key=(lambda allied_creep: creeps_with_distance_to_hero[allied_creep]))
+        return min(creeps_with_distance_to_hero.keys(),
+                   key=(lambda allied_creep: creeps_with_distance_to_hero[allied_creep]))

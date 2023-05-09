@@ -55,7 +55,6 @@ class BotFramework:
 
         for hero in self.world.get_player_heroes():
             self.agent.actions(hero, game_ticks)
-
         self.agent.after_actions(game_ticks)
 
     def receive_bot_commands(self) -> list[dict[str, CommandProps]]:

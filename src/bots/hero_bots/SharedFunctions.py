@@ -17,7 +17,7 @@ class SharedFunctions:
     def __init__(self):
         pass
     
-    def get_weakest_unit(units: List[Unit]) -> Optional[Unit]:
+    def get_weakest_unit(units: list[Unit]) -> Optional[Unit]:
         """
         Finds the unit with the lowest damage among a list of units and returns it.
         Args:
