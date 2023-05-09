@@ -3,10 +3,10 @@ from bots.test_bots.design.abstraction.RecipeItem import RecipeItem
 from game.player_hero import PlayerHero
 
 
-def generate_item_tuple(item: RecipeItem) -> tuple:
+def generate_item_list(item: RecipeItem) -> list:
     components = item.get_required_items()
-    item_names_tuple = tuple(component.name for component in components)
-    return item_names_tuple
+    item_names_list = list(component.name for component in components)
+    return item_names_list
 
 
 def attempt_item_purchase(item: Dota2Item, hero: PlayerHero) -> bool:
@@ -48,9 +48,9 @@ def attempt_complete_item_purchase(item: RecipeItem, hero: PlayerHero) -> bool:
     Returns:
     bool: True if the purchase was successful, False otherwise.
     """
-    components = generate_item_tuple(item)
+    components = generate_item_list(item)
     if hero.get_gold() > item.cost:
-        hero.buy_combined(list(components))
+        hero.buy_combined(components)
         return True
     else:
         return False
