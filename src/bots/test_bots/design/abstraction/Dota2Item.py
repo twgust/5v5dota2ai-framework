@@ -24,8 +24,7 @@ from typing import List
 # and Role (Carry, Support, etc.),
 # and Attribute (Strength, Agility, Intelligence)
 class Dota2Item:
-    def __init__(self, name: str, cost: int, hasActiveEffect: bool, active_effect: str,
-                 attribute: list[str]) -> None:
+    def __init__(self, name: str, cost: int, hasActiveEffect: bool, active_effect: str, attribute: dict[str, str]) -> None:
         self.name = name
         self.cost = cost
         self.is_active = hasActiveEffect

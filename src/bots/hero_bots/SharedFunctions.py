@@ -17,13 +17,48 @@ class SharedFunctions:
     def __init__(self):
         pass
     
-    def get_weakest_unit(units: List[Unit]) -> Optional[Unit]:
+    def find_closest_unit(self, hero: PlayerHero, units: list[Unit], entity_accessor) -> Optional[Unit]:
+        closest_unit = None
+        closest_distance = float('inf')
+        for unit in units:
+            entity_value = entity_accessor(unit)
+            if entity_value:
+                distance_to_entity = self.distance_to(hero.get_position(), entity_value)
+                if distance_to_entity < closest_distance:
+                    closest_unit = unit
+                    closest_distance = distance_to_entity
+        return closest_unit
+
+    def get_closest_unit(self, hero: PlayerHero, units: list[Unit]) -> Optional[Unit]:
         """
-        Finds the unit with the lowest damage among a list of units and returns it.
-        Args:
-            entities (List[Unit]): The list of units to search for the weakest one.
-        Returns:
-            Optional[Unit]: The unit with the lowest health among the input list, or None if the input list is empty.
+        Returns the closest unit from a list of units to the hero.
+        """
+        return self.find_closest_unit(hero, units, lambda unit: unit.get_position())
+
+    def get_closest_unit_position(self, hero: PlayerHero, units: list[Unit]) -> Optional[Position]:
+        """
+        Returns the position of the closest unit from a list of units to the hero, convenience function
+        since you can just call unit.get_position() on the returned unit to get position
+        """
+        return self.get_closest_unit(hero, units).get_position()
+
+    def get_closest_attacked_enemy_hero(self, hero: PlayerHero, world: World) -> Optional[Unit]:
+        enemies = world.get_enemy_heroes_of(hero)
+        for enemy in enemies:
+            if not enemy.get_has_aggro():
+                enemies.remove(enemy)
+        # to get the location, you can simply call enemy.get_position() on the returned unit
+        return self.get_closest_unit(hero, enemies)
+
+    def get_closest_friendly_tower_position(self, hero: PlayerHero, world: World) -> Optional[Position]:
+        return self.get_closest_unit_position(hero, world.get_allied_towers_of(hero))
+
+    def get_closest_friendly_tower(self, hero: PlayerHero, world: World) -> Optional[Unit]:
+        return self.get_closest_unit(hero, world.get_allied_towers_of(hero))
+
+    def get_weakest_unit(units: list[Unit]) -> Optional[Unit]:
+        """
+        Finds the unit with the lowest damage among a list of units and returns it..
         """
         weakest_unit = None
         lowest_damage = float('inf')
@@ -35,84 +70,19 @@ class SharedFunctions:
                     lowest_damage = unit_damage
         return weakest_unit
 
-
-    def _get_closest_entity(self, hero: PlayerHero, world: World, entity_type: str, entity_accessor,
-                            return_type: str) -> Optional[Union[Unit, Position]]:
+    def get_lowest_health_unit(self, units: list[Unit]) -> Optional[Unit]:
         """
-        Finds the closest entity of the specified type to the given hero and returns it.
-        Args:
-            hero (PlayerHero): The hero to find the closest entity for.
-            world (World): The game world containing the entities and state information.
-            entity_type (str): The type of entity to find (e.g. "enemy_hero").
-            entity_accessor: A function that takes an entity and returns the value to compare distances to.
-            return_type (str): The type of value to return, either "Unit" or "Position".
-        Returns:
-            Optional[Union[Unit, Position]]: The closest entity of the specified type to the hero, or None if no such entity
-            exists in the game world.
-        Raises:
-            ValueError: If an invalid entity type is specified.
+        Finds the unit with the lowest health among a list of units and returns it.
         """
-        if entity_type == "enemy_hero":
-            entities = world.get_enemy_heroes_of(hero)
-        elif entity_type == "friendly_tower":
-            entities = world.get_allied_towers_of(hero)
-        elif entity_type == "enemy_tower":
-            entities = world.get_enemy_towers_of(hero)
-        elif entity_type == "friendly_creep":
-            entities = world.get_allied_creeps_of(hero)
-        elif entity_type == "enemy_creep":
-            entities = world.get_enemy_creeps_of(hero)
-        else:
-            raise ValueError("Invalid entity type")
-
-        closest_entity = None
-        closest_distance = float('inf')
-        for entity in entities:
-            entity_value = entity_accessor(entity)
-            if entity_value:
-                distance_to_entity = self.distance_to(hero.get_position(), entity_value)
-                if distance_to_entity < closest_distance:
-                    closest_entity = entity if return_type == "Unit" else entity_value
-                    closest_distance = distance_to_entity
-        return closest_entity
-
-    def get_closest_unit_position(self, hero: PlayerHero, world: World, entity_type: str) -> Optional[Position]:
-        """
-         Finds the closest entity position of the specified type to the given hero and returns it.
-         Args:
-             hero (PlayerHero): The hero to find the closest entity position for.
-             world (World): The game world containing the entities and state information.
-             entity_type (str): The type of entity to find (e.g. "enemy_hero").
-         Returns:
-             Optional[Position]: The closest entity position of the specified type to the hero,
-             or None if no such entity exists in the game world.
-         """
-        return self._get_closest_entity(hero, world, entity_type, lambda entity: entity.get_position(), "Position")
-
-    def get_closest_entity(self, hero: PlayerHero, world: World, entity_type: str) -> Optional[Unit]:
-        """
-        Finds the closest entity of the specified type to the given hero and returns it.
-        Args:
-            hero (PlayerHero): The hero to find the closest entity for.
-            world (World): The game world containing the entities and state information.
-            entity_type (str): The type of entity to find (e.g. "enemy_hero").
-        Returns:
-            Optional[Unit]: The closest entity of the specified type to the hero, or None if no such entity exists in the game
-            world.
-        """
-        return self._get_closest_entity(hero, world, entity_type, lambda entity: entity, "Unit")
-
-    def get_closest_friendly_tower_position(self, hero, world) -> Position | None:
-        return self.get_closest_unit_position(hero, world, "friendly_tower")
-
-    def get_closest_friendly_tower(self, hero, world) -> Unit | None:
-        return self.get_closest_entity(hero, world, "friendly_tower")
-
-    def get_closest_enemy_hero_position(self, hero, world) -> Position | None:
-        return self.get_closest_unit_position(hero, world, "enemy_hero")
-
-    def get_closest_enemy_hero(self, hero, world) -> Unit | None:
-        return self.get_closest_entity(hero, world, "enemy_hero")
+        lowest_health_unit = None
+        lowest_health = float('inf')
+        for unit in units:
+            if isinstance(unit, Unit):
+                unit_health = unit.get_health()
+                if unit_health < lowest_health:
+                    lowest_health_unit = unit
+                    lowest_health = unit_health
+        return lowest_health_unit
 
     def get_pushing_creeps_position(self, hero: Hero, world: World, target_lane: str):
         friendly_creeps = world.get_allied_creeps_of(hero)

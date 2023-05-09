@@ -1,3 +1,5 @@
+from typing import Dict
+
 from bots.test_bots.design.abstraction.Dota2Item import Dota2Item
 
 
@@ -6,8 +8,8 @@ from bots.test_bots.design.abstraction.Dota2Item import Dota2Item
 # it # this class is used to represent the recipe items in the game
 
 class RecipeItem(Dota2Item):
-    def __init__(self, name: str, cost: int, is_active: bool, notes: str, attribute: [str],
-                 required_items: list[Dota2Item]):
+    def __init__(self, name: str, cost: int, is_active: bool, notes: str,
+                 attribute: dict[str, str], required_items: list[Dota2Item]):
         super().__init__(name, cost, is_active, notes, attribute)
         self.required_items = required_items
 
