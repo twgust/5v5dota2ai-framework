@@ -59,8 +59,6 @@ class SniperMid(BaseHero):
 
     def get_move(self, hero: PlayerHero, game_ticks: int, world: World) -> None:
         """Get a move generated from this specific hero, takes the hero object and current world object as parameter"""
-        # for v in hero.get_abilities():
-        #   print(v.get_name(), v.get_ability_index(), v.get_ability_damage())
         if world.get_team() == RADIANT_TEAM:
             # Test 1: Works
             #   cord = self._shared_functions.get_pushing_creeps_for_lane_pos(hero, world, "mid")
@@ -74,8 +72,8 @@ class SniperMid(BaseHero):
             else:
                 assert hero.get_buyback_cooldown_time() == 0
             return
-        # if self.level_up_ability(hero):
-        #   return
+        if self.level_up_ability(hero):
+            return
         #   if self.cast_ability(hero, world):
         #     return
         if hero.get_gold() > 505:
@@ -98,7 +96,6 @@ class SniperMid(BaseHero):
             return
         if self._shared_functions.deny_creep(hero, world):
             return
-
 
     def level_up_ability(self, hero: PlayerHero) -> bool:
         if hero.get_ability_points() > 0:
