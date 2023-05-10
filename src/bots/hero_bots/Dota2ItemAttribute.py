@@ -1,0 +1,27 @@
+from enum import Enum
+
+
+class Dota2Attribute(Enum):
+    BONUS_AGILITY = "bonus_agility"
+    BONUS_STRENGTH = "bonus_strength"
+    BONUS_INTELLIGENCE = "bonus_intelligence"
+    BONUS_DAMAGE = "bonus_damage"
+    BONUS_ARMOR = "bonus_armor"
+    BONUS_HEALTH = "bonus_health"
+    BONUS_MANA = "bonus_mana"
+    BONUS_HEALTH_REGEN = "bonus_health_regen"
+    BONUS_MANA_REGEN = "bonus_mana_regen"
+    BONUS_ATTACK_SPEED = "bonus_attack_speed"
+    BONUS_MOVEMENT_SPEED = "bonus_movement_speed"
+    BONUS_SPELL_AMPLIFICATION = "bonus_spell_amplification"
+    BONUS_MAGIC_RESISTANCE = "bonus_magic_resistance"
+    BONUS_EVASION = "bonus_evasion"
+    BONUS_STATUS_RESISTANCE = "bonus_status_resistance"
+    BONUS_LIFESTEAL = "bonus_lifesteal"
+    BONUS_COOLDOWN_REDUCTION = "bonus_cooldown_reduction"
+    BONUS_ALL_STATS = "bonus_all_stats"
+    BONUS_CAST_RANGE = "bonus_cast_range"
+    BONUS_ATTACK_RANGE = "bonus_attack_range"
+    BONUS_VISION_RANGE = "bonus_vision_range"
+    BONUS_CRITICAL_STRIKE = "bonus_critical_strike"
+    BONUS_SCEPTER_UPGRADE = "bonus_scepter_upgrade"

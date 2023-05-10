@@ -1,6 +1,12 @@
+from enum import Enum
+
+from bots.hero_bots.Dota2ItemAttribute import Dota2Attribute
+from bots.hero_bots.Dota2PlayerHeroRole import Dota2Role
 from bots.test_bots.design.abstraction.Dota2Item import Dota2Item
+from bots.test_bots.design.abstraction.ItemsList import ItemsList
 from bots.test_bots.design.abstraction.RecipeItem import RecipeItem
 from game.player_hero import PlayerHero
+from pprint import pprint
 
 
 def generate_item_list(item: RecipeItem) -> list:
@@ -85,12 +91,68 @@ def buy_max_build_item(potential_items: list[Dota2Item], hero: PlayerHero) -> bo
     :param hero: A PlayerHero object representing the hero who wants to buy the item.
     """
     if potential_items:
-        max_cost_item = max(potential_items, key=lambda item: item.cost if item.cost <= hero.get_gold() else float('-inf'))
+        max_cost_item = max(potential_items,
+                            key=lambda item: item.cost if item.cost <= hero.get_gold() else float('-inf'))
         if max_cost_item is not None:
             if max_cost_item.name not in [item.name for item in hero.get_items()]:
                 if isinstance(max_cost_item, RecipeItem):
-                    hero.buy_combined(list(generate_item_tuple(max_cost_item)))
+                    hero.buy_combined(generate_item_list(max_cost_item))
                 else:
                     hero.buy(max_cost_item.name)
                 return True
     return False
+
+
+def buy_suitable_item(hero: PlayerHero, role: Dota2Role, item_lists: ItemsList, attribute: Dota2Attribute) -> bool:
+    items = []
+    if role == Dota2Role.CARRY:
+        items = item_lists.get_carry_items()
+    elif role == Dota2Role.SUPPORT:
+        items = item_lists.get_support_items()
+    else:
+        return False
+    calculate_highest_score(hero, items, role, attribute)
+    return True
+
+
+def calculate_highest_score(hero: PlayerHero, item_list: list[Dota2Item], role: Dota2Role,
+                            attribute: Dota2Attribute) -> float:
+    """
+    This function calculates the highest score among the items in the item_list passed in the argument,
+    for the given hero. It takes a list of potential_items (a list of Dota2Item objects) and a hero (a PlayerHero object)
+    as input parameters and returns a boolean value indicating if the purchase was successful or not.
+
+    :param potential_items: A list of potential Dota2Item objects that the hero can buy.
+    :param hero: A PlayerHero object representing the hero who wants to buy the item.
+    """
+    if item_list:
+        max_score_item = max(item_list, key=lambda item: calculate_item_score(hero, item, role, attribute))
+        if max_score_item is not None:
+            if max_score_item.name not in [item.name for item in hero.get_items()]:
+                if isinstance(max_score_item, RecipeItem):
+                    hero.buy_combined(generate_item_list(max_score_item))
+                else:
+                    hero.buy(max_score_item.name)
+                return True
+    return False
+
+
+def calculate_item_score(hero: PlayerHero, item: Dota2Item, role: Dota2Role, attribute: Dota2Attribute) -> float:
+    if role == Dota2Role.CARRY:
+        return calculate_carry_item_score(hero, item, attribute)
+    elif role == Dota2Role.SUPPORT:
+        return calculate_support_item_score(hero, item, attribute)
+    return 0
+
+
+def calculate_carry_item_score(hero: PlayerHero, item: Dota2Item, attribute: Dota2Attribute) -> float:
+    score = 0
+    if str(attribute.value) in item.attribute.keys():
+        score += 1
+    if "bonus_damage" in item.attribute.keys():
+        score += 2
+    return score
+
+
+def calculate_support_item_score(hero: PlayerHero, item: Dota2Item) -> float:
+    return 0

@@ -22,6 +22,9 @@ class ItemsList:
 
     _items_list_recipes: list[RecipeItem]
 
+    _items_carry: list[Dota2Item]
+    _items_support: list[Dota2Item]
+
     def __init__(self):
         self._items_dict = {}
         self._items_dict_recipe = {}
@@ -34,6 +37,9 @@ class ItemsList:
         self._items_list_passive = self.getAllPassiveItems()
         self._items_list_active = self.getAllActiveItems()
         self._items_list_recipes = self.getAllRecipeItems()
+
+        self._items_carry = self.load_carry_items()
+        self._items_support = self.load_support_items()
         self.generate_attribute_lists()
 
         # self.openJsonFile('items.json')
@@ -53,6 +59,42 @@ class ItemsList:
             return self._items_list_intelligence
         else:
             return self.get_items_list()
+
+    def load_carry_items(self) -> list[Dota2Item]:
+        fetched_items = []
+        for item_name in ["item_battle_fury", "item_black_king_bar", "item_butterfly",
+                          "item_daedalus", "item_desolator", "item_eye_of_skadi",
+                          "item_monkey_king_bar", "item_manta_style", "item_satanic",
+                          "item_abyssal_blade", "item_divine_rapier", "item_mask_of_madness",
+                          "item_assault_cuirass", "item_diffusal_blade", "item_hurricane_pike",
+                          "item_sange_and_yasha", "item_heavens_halberd", "item_nullifier",
+                          "item_bloodthorn", "item_ethereal_blade", "item_radiance",
+                          "item_heart_of_tarrasque", "item_armlet_of_mordiggian"]:
+
+            item = self._items_dict.get(item_name)
+            if item:
+                fetched_items.append(item)
+        return fetched_items
+
+    def get_carry_items(self) -> list[Dota2Item]:
+        return self._items_carry
+
+    def load_support_items(self) -> list[Dota2Item]:
+        support_items = []
+
+        for item_name in ["item_ward_observer", "item_ward_sentry", "item_smoke_of_deceit", "item_tome_of_knowledge",
+                          "item_glimmer_cape", "item_force_staff", "item_eul_scepter_of_divinity", "item_blink_dagger",
+                          "item_ghost_scepter", "item_aeon_disk", "item_medallion_of_courage", "item_solar_crest",
+                          "item_urn_of_shadows", "item_spirit_vessel", "item_rod_of_atos", "item_lotus_orb",
+                          "item_cyclone", "item_black_king_bar"]:
+            item = self._items_dict.get(item_name)
+
+            if item:
+                support_items.append(item)
+        return support_items
+
+    def get_support_items(self) -> list[Dota2Item]:
+        return self._items_support
 
     def get_items_list(self) -> list[Dota2Item]:
         return self._items_list
@@ -144,7 +186,10 @@ class ItemsList:
         print("Creating item:" + item + ", components: " + str(item_components))
         item_cd = data.get(item).get("cd")
         required_items_list = []
+
         for component in item_components:
+            temp_attrib_dict = {}
+
             if component is not None or component != "":
                 temp_dota2_item_name = "item_" + component
                 temp_dota2_item_cost = data.get(component).get("cost")
@@ -153,17 +198,31 @@ class ItemsList:
                 else:
                     temp_dota2_item_active_effect = True
                 temp_dota2_item_notes = data.get(component).get("hint")
-                temp_dota2_item_attribs = data.get(component).get("attrib")
+                temp_attrib_dict = self.create_item_attribute_dictionary(data, component)
+
                 dota2_item = Dota2Item(temp_dota2_item_name, temp_dota2_item_cost, temp_dota2_item_active_effect,
-                                       temp_dota2_item_notes, temp_dota2_item_attribs)
+                                       temp_dota2_item_notes, temp_attrib_dict)
                 required_items_list.append(dota2_item)
 
         recipe = self.find_recipe_for_item(item, data)
+        attrib_dict = self.create_item_attribute_dictionary(data, item)
         if recipe is not None:
             required_items_list.append(recipe)
         recipe_item = RecipeItem(str("item_" + item), data.get(item).get("cost"), False,
-                                 data.get(item).get("hint"), data.get(item).get("attrib"), required_items_list)
+                                 data.get(item).get("hint"), attrib_dict, required_items_list)
         return recipe_item
+
+    def create_item_attribute_dictionary(self, data: dict, item_name: str) -> dict[str, str]:
+        attribs = data.get(item_name).get("attrib")
+        attrib_dict = {}
+        if attribs is not None:
+            for attrib in attribs:
+                attribute_value = attrib.get("value")
+                if attribute_value is not None:
+                    attrib_dict[attrib.get("key")] = attrib.get("value")
+                else:
+                    attrib_dict[attrib.get("key")] = "none"
+        return attrib_dict
 
     def find_recipe_for_item(self, item: str, data: dict) -> Dota2Item | None:
         """
@@ -224,29 +283,18 @@ class ItemsList:
                 item_components = data.get(item).get("components")
                 item_cost = data.get(item).get("cost")
                 attribs = data.get(item).get("attrib")
+
                 if attribs is None:
                     item_attribute = "None"
                     # print(item_attribute)
                 else:
                     attrib_array = []
-                    for attrib in attribs:
-                        # print(attrib.keys())
-                        # print(attrib.values())
-                        item_attribute = attrib.get("header")
-                        # print(item_attribute)
-                        if attrib.get("header") == "+" or attrib.get("header") == "-":
-                            attribute_value = attrib.get("value")
-                            attrib_array.append(attrib.get("footer"))
-                            # attribute_footer = attrib.get("footer")
-                        else:
-                            attribute_value = "empty"
-                            attrib_array.append(attribute_value)
-
+                    attrib_dict = self.create_item_attribute_dictionary(data, item)
                 # check to see if item is a base item,
                 # if it is, create a Dota2Item object,
                 # if not, create a RecipeItem object
                 if self.isBaseItem(item, data):
-                    dota2_item = Dota2Item(name, item_cost, item_has_active_effect, item_notes, attrib_array)
+                    dota2_item = Dota2Item(name, item_cost, item_has_active_effect, item_notes, attrib_dict)
                     self.validateDota2Item(dota2_item)
                     itemlist.append(dota2_item)
                     self.add_to_dictionary(dota2_item)

@@ -1,5 +1,7 @@
 from bots.hero_bots import ItemFunctions
 from bots.hero_bots.BaseHero import BaseHero
+from bots.hero_bots.Dota2ItemAttribute import Dota2Attribute
+from bots.hero_bots.Dota2PlayerHeroRole import Dota2Role
 from bots.hero_bots.SharedFunctions import SharedFunctions
 from bots.test_bots import TestHeroTeam
 from bots.test_bots.design.abstraction.Dota2Item import Dota2Item
@@ -64,8 +66,9 @@ class SniperMid(BaseHero):
             #   cord = self._shared_functions.get_pushing_creeps_for_lane_pos(hero, world, "mid")
             #   hero.move(cord.x, cord.y, cord.z)
             # Test 2: Works
-            #   cord = self._shared_functions.get_closest_friendly_tower_position(hero, world)
-            #   hero.move(cord.x, cord.y, cord.z)
+            ItemFunctions.buy_suitable_item(hero, Dota2Role.CARRY, self._items_list, Dota2Attribute.BONUS_STRENGTH)
+            cord = self._shared_functions.get_closest_friendly_tower_position(hero, world)
+            hero.move(cord.x, cord.y, cord.z)
 
             if not hero.is_alive():
                 hero.buyback()
