@@ -178,10 +178,10 @@ class TestBotBasicSmart(BaseBot):
             self._go_aggressive_step2 = True
 
     def actions(self, hero: PlayerHero, game_ticks: int) -> None:
-        if not hero.is_alive():  # This seems to be broken as it gets stuck as false after dying randomly
+        """if not hero.is_alive():  # This seems to be broken as it gets stuck as false after dying randomly
             if hero.get_buyback_cooldown_time() == 0 and hero.get_gold() >= hero.get_buyback_cost():
                 hero.buyback()
-                return
+                return"""
 
         if hero.get_stash_items():
             print("Has stash items")
@@ -194,6 +194,9 @@ class TestBotBasicSmart(BaseBot):
             # if self.hero_name_match_any(hero, ["pugna"]):
             #     hero.buy("item_ward_observer")
             # else:
+            print("--- Abilities for ", hero.get_name(), " ---")
+            for ability in hero.get_abilities():
+                print(ability.get_name(), "Index:", ability.get_ability_index(), "Type:", ability.get_ability_type())
             hero.buy("item_boots")
             return
 
@@ -350,8 +353,9 @@ class TestBotBasicSmart(BaseBot):
             return "dota_badguys_tower3_bot"
 
     def make_choice(self, hero: PlayerHero) -> None:
-        if self.level_up_ability(hero):
-            return
+        if hero.get_level() < 27: # Gets stuck here otherwise because handling talents in the tree is weird
+            if self.level_up_ability(hero):
+                return
 
         lane = party[self._world.get_team()][hero.get_name()]["lane"]
 
@@ -363,15 +367,17 @@ class TestBotBasicSmart(BaseBot):
             self.push_lane(hero, self.get_bot_push_tower_name())
 
     def level_up_ability(self, hero: PlayerHero) -> bool:
-        if hero.get_ability_points() > 0:
+        if hero.get_ability_points() >= 1:
+            print(hero.get_name(), hero.get_level(), hero.get_ability_points())
             if self.level_up_ultimate(hero):
                 return True
 
             for ability in hero.get_abilities():
-                if ability.get_level() < ability.get_max_level() \
-                        and hero.get_level() >= ability.get_hero_level_required_to_level_up():
-                    hero.level_up(ability.get_ability_index())
-                    return True
+                if ability.get_ability_index() <= 4:
+                    if ability.get_level() < ability.get_max_level() \
+                            and hero.get_level() >= ability.get_hero_level_required_to_level_up():
+                        hero.level_up(ability.get_ability_index())
+                        return True
 
         return False
 
@@ -566,7 +572,7 @@ class TestBotBasicSmart(BaseBot):
                 self.follow(hero, self.get_closest_allied_creep(hero))
 
             elif closest_enemy_building is not None:
-                hero.attack(closest_enemy_building.get_position())
+                hero.attack(closest_enemy_building)
 
             else:
                 hero.stop()

@@ -2,6 +2,7 @@ from typing import Literal, TypedDict, Union, cast, Optional
 from game.hero import Hero
 from game.player_hero import PlayerHero
 from game.position import Position
+from game.tower import Tower
 from game.unit import Unit
 from game.world import World
 
@@ -70,7 +71,10 @@ class SharedFunctions:
         for entity in entities:
             entity_value = entity_accessor(entity)
             if entity_value:
-                distance_to_entity = self.distance_to(hero.get_position(), entity_value)
+                if isinstance(entity, Tower):
+                    distance_to_entity = self.distance_to(hero.get_position(), entity_value.get_position())
+                else:
+                    distance_to_entity = self.distance_to(hero.get_position(), entity_value)
                 if distance_to_entity < closest_distance:
                     closest_entity = entity if return_type == "Unit" else entity_value
                     closest_distance = distance_to_entity
