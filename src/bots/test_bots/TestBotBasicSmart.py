@@ -353,7 +353,7 @@ class TestBotBasicSmart(BaseBot):
             return "dota_badguys_tower3_bot"
 
     def make_choice(self, hero: PlayerHero) -> None:
-        if hero.get_level() < 27: # Gets stuck here otherwise because handling talents in the tree is weird
+        if hero.get_level() < 27:  # Gets stuck here otherwise because handling talents in the tree is weird
             if self.level_up_ability(hero):
                 return
 
@@ -368,7 +368,9 @@ class TestBotBasicSmart(BaseBot):
 
     def level_up_ability(self, hero: PlayerHero) -> bool:
         if hero.get_ability_points() >= 1:
-            print(hero.get_name(), hero.get_level(), hero.get_ability_points())
+            print(hero.get_name(), hero.get_level(), hero.get_ability_points(), hero.get_abilities()[0].get_level(),
+                  hero.get_abilities()[1].get_level(), hero.get_abilities()[2].get_level(),
+                  hero.get_abilities()[3].get_level())
             if self.level_up_ultimate(hero):
                 return True
 
@@ -457,16 +459,18 @@ class TestBotBasicSmart(BaseBot):
         if self.courier_is_dead(hero):
             return False
 
-        if not self.courier_has_blades_of_attack(hero) and hero.get_gold() >= 450:
+        if not self.courier_has_blades_of_attack(hero) and not self.hero_has_item(hero,
+                                                                                  "item_blades_of_attack") and hero.get_gold() >= 450:
             hero.buy("item_blades_of_attack")
             return True
 
-        if not self.courier_has_chainmail(hero) and hero.get_gold() >= 550:
+        if not self.courier_has_chainmail(hero) and not self.hero_has_item(hero,
+                                                                           "item_chainmail") and hero.get_gold() >= 550:
             hero.buy("item_chainmail")
             return True
 
         if self.courier_has_blades_of_attack(hero) and self.courier_has_chainmail(hero) and not \
-        self._courier_transferring_items[hero.get_name()]:
+                self._courier_transferring_items[hero.get_name()]:
             hero.courier_transfer_items()
             self._courier_transferring_items[hero.get_name()] = True
             return True
@@ -510,6 +514,12 @@ class TestBotBasicSmart(BaseBot):
                     return True
         return False
 
+    def hero_has_item(self, hero: PlayerHero, item_name: str) -> bool:
+        for item in hero.get_items():
+            if item.get_name() == item_name:
+                return True
+        return False
+
     def get_courier_position(self, hero: PlayerHero) -> Position:
         courier = self._world.get_entity_by_id(hero.get_courier_id())
         assert courier is not None
@@ -542,7 +552,8 @@ class TestBotBasicSmart(BaseBot):
         if self.is_near_allied_creeps(hero) and not hero.get_has_tower_aggro():
             enemy_hero_to_attack: Union[Hero, None] = self.get_enemy_hero_to_attack(hero)
             closest_enemy: Union[Unit, None] = self.get_closest_enemy(hero)
-            closest_enemy_building: Union[Building, None] = self._shared_functions.get_closest_enemy_building(hero, self._world)
+            closest_enemy_building: Union[Building, None] = self._shared_functions.get_closest_enemy_building(hero,
+                                                                                                              self._world)
 
             if enemy_hero_to_attack is not None \
                     and self.should_attack_hero(hero, enemy_hero_to_attack):
@@ -568,7 +579,8 @@ class TestBotBasicSmart(BaseBot):
                 hero.attack(enemy_hero_to_attack)
 
             elif self.should_move_closer_to_allied_creeps(hero) \
-                    and not self.get_closest_allied_creep(hero).get_name() == "npc_dota_base_blocker": # Added because the base blocker is treated as a creep which makes heroes get stuck on it.
+                    and not self.get_closest_allied_creep(
+                hero).get_name() == "npc_dota_base_blocker":  # Added because the base blocker is treated as a creep which makes heroes get stuck on it.
                 self.follow(hero, self.get_closest_allied_creep(hero))
 
             elif closest_enemy_building is not None:
