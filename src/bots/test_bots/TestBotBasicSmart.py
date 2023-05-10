@@ -542,7 +542,7 @@ class TestBotBasicSmart(BaseBot):
         if self.is_near_allied_creeps(hero) and not hero.get_has_tower_aggro():
             enemy_hero_to_attack: Union[Hero, None] = self.get_enemy_hero_to_attack(hero)
             closest_enemy: Union[Unit, None] = self.get_closest_enemy(hero)
-            closest_enemy_building: Union[Building, None] = self._shared_functions.get_closest_entity(hero, self._world, "enemy_tower")
+            closest_enemy_building: Union[Building, None] = self._shared_functions.get_closest_enemy_building(hero, self._world)
 
             if enemy_hero_to_attack is not None \
                     and self.should_attack_hero(hero, enemy_hero_to_attack):

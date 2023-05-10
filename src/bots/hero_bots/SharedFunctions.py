@@ -57,6 +57,9 @@ class SharedFunctions:
     def get_closest_friendly_tower(self, hero: PlayerHero, world: World) -> Optional[Unit]:
         return self.get_closest_unit(hero, world.get_allied_towers_of(hero))
 
+    def get_closest_enemy_building(self, hero: PlayerHero, world: World) -> Optional[Unit]:
+        return self.get_closest_unit(hero, world.get_enemy_towers_of(hero))
+
     def get_weakest_unit(units: list[Unit]) -> Optional[Unit]:
         """
         Finds the unit with the lowest damage among a list of units and returns it..
@@ -89,7 +92,7 @@ class SharedFunctions:
         friendly_creeps = world.get_allied_creeps_of(hero)
         closest_creep = None
         closest_distance = float('inf')
-        closest_enemy_tower_mid = self.get_closest_enemy_tower_for_lane(hero, world, target_lane)
+        closest_enemy_tower_mid = self.get_closest_enemy_tower_for_lane_position(hero, world, target_lane)
 
         for creep in friendly_creeps:
             creep_position = creep.get_position()
@@ -100,11 +103,17 @@ class SharedFunctions:
                     closest_distance = distance_to_creep
         return closest_creep
 
-    def get_closest_enemy_tower_for_lane(self, hero: Hero, world: World, target_lane: str) -> Position:
+    def get_closest_enemy_tower_for_lane_position(self, hero: Hero, world: World, target_lane: str) -> Position:
         enemy_towers = world.get_enemy_towers_of(hero)
         for tower in enemy_towers:
             if target_lane in tower.get_name():
                 return tower.get_position()
+
+    def get_closest_enemy_tower_for_lane(self, hero: Hero, world: World, target_lane: str) -> Tower:
+        enemy_towers = world.get_enemy_towers_of(hero)
+        for tower in enemy_towers:
+            if target_lane in tower.get_name():
+                return tower
 
     def distance_to(self, hero_position: Position, other: Position) -> float:
         return ((hero_position.x - other.x) ** 2 + (hero_position.y - other.y) ** 2 + (
