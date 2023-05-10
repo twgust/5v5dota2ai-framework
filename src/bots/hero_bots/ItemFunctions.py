@@ -138,6 +138,12 @@ def calculate_highest_score(hero: PlayerHero, item_list: list[Dota2Item], role: 
 
 
 def calculate_item_score(hero: PlayerHero, item: Dota2Item, role: Dota2Role, attribute: Dota2Attribute) -> float:
+    """
+    hero (PlayerHero): The hero who's doing the purchasing
+    item (Dota2Item): The item that the hero wishes to purchase
+    role (Dota2Role): The role of the hero
+    attribute (Dota2Attribute): The attribute that the hero wishes to prioritize
+    """
     if role == Dota2Role.CARRY:
         return calculate_carry_item_score(hero, item, attribute)
     elif role == Dota2Role.SUPPORT:
@@ -146,11 +152,32 @@ def calculate_item_score(hero: PlayerHero, item: Dota2Item, role: Dota2Role, att
 
 
 def calculate_carry_item_score(hero: PlayerHero, item: Dota2Item, attribute: Dota2Attribute) -> float:
+    """
+    hero (PlayerHero): The hero who's doing the purchasing
+    item (Dota2Item): The item that the hero wishes to purchase
+    attribute (Dota2Attribute): The attribute that the hero wishes to prioritize
+    """
     score = 0
+    bonus_damage_weight = 2.0
+    # Add 2 points for every point of the desired attribute
     if str(attribute.value) in item.attribute.keys():
-        score += 1
+        score += float(item.attribute[str(attribute.value)]) * 2
+
+    # Add 2 points for every bonus damage point
     if "bonus_damage" in item.attribute.keys():
-        score += 2
+        score += bonus_damage_weight
+
+    # Add 1 point for every 10 attack speed points
+    if "bonus_attack_speed" in item.attribute.keys():
+        score += float(item.attribute["bonus_attack_speed"]) // 10
+
+    # Add 1 point for every 3% lifesteal
+    if "lifesteal_percent" in item.attribute.keys():
+        score += float(item.attribute["lifesteal_percent"]) // 3
+
+    # Add 1 point for every 3 points of armor
+    if "bonus_armor" in item.attribute.keys():
+        score += float(item.attribute["bonus_armor"]) // 3
     return score
 
 

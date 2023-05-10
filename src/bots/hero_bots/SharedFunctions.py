@@ -17,7 +17,7 @@ from game.world import World
 class SharedFunctions:
     def __init__(self):
         pass
-    
+
     def find_closest_unit(self, hero: PlayerHero, units: list[Unit], entity_accessor) -> Optional[Unit]:
         closest_unit = None
         closest_distance = float('inf')
@@ -43,7 +43,38 @@ class SharedFunctions:
         """
         return self.get_closest_unit(hero, units).get_position()
 
+    def get_closest_allied_tower_position(self, hero: PlayerHero, world: World) -> Optional[Position]:
+        """
+        Tested
+        """
+        return self.get_closest_unit_position(hero, world.get_allied_towers_of(hero))
+
+    def get_closest_allied_tower(self, hero: PlayerHero, world: World) -> Optional[Unit]:
+        """
+        Tested
+        """
+        return self.get_closest_unit(hero, world.get_allied_towers_of(hero))
+
+    def get_closest_attacked_allied_tower(self, hero: PlayerHero, world: World) -> Optional[Unit]:
+        """
+        Tested
+        """
+        friendly_towers = world.get_allied_towers_of(hero)
+        enemy_heroes = world.get_enemy_heroes_of(hero)
+        attacked_towers = []
+        for enemies in enemy_heroes:
+            for tower in friendly_towers:
+                if enemies.get_attack_target() == tower.get_id():
+                    attacked_towers.append(tower)
+        if attacked_towers:
+            return self.get_closest_unit(hero, attacked_towers)
+        else:
+            return None
+
     def get_closest_attacked_enemy_hero(self, hero: PlayerHero, world: World) -> Optional[Unit]:
+        """
+        Tested
+        """
         enemies = world.get_enemy_heroes_of(hero)
         for enemy in enemies:
             if not enemy.get_has_aggro():
@@ -51,11 +82,22 @@ class SharedFunctions:
         # to get the location, you can simply call enemy.get_position() on the returned unit
         return self.get_closest_unit(hero, enemies)
 
-    def get_closest_friendly_tower_position(self, hero: PlayerHero, world: World) -> Optional[Position]:
-        return self.get_closest_unit_position(hero, world.get_allied_towers_of(hero))
-
-    def get_closest_friendly_tower(self, hero: PlayerHero, world: World) -> Optional[Unit]:
-        return self.get_closest_unit(hero, world.get_allied_towers_of(hero))
+    def is_enemy_hero_in_enemy_tower_range(self, hero: PlayerHero, world: World) -> bool:
+        """
+        Returns true if the enemy hero is under a tower
+        Tested
+        """
+        enemy_heroes = world.get_enemy_heroes_of(hero)
+        enemy_towers = world.get_enemy_heroes_of(hero)
+        closest_enemy_hero = self.get_closest_unit(hero, enemy_heroes)
+        if closest_enemy_hero:
+            for enemy_tower in enemy_towers:
+                enemy_tower.get_attack_range()
+                if enemy_tower.get_position():
+                    if self.distance_to(closest_enemy_hero.get_position(), enemy_tower.get_position()) \
+                            < enemy_tower.get_attack_range():
+                        return True
+        return False
 
     def get_closest_enemy_building(self, hero: PlayerHero, world: World) -> Optional[Unit]:
         return self.get_closest_unit(hero, world.get_enemy_towers_of(hero))

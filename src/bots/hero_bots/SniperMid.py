@@ -67,8 +67,6 @@ class SniperMid(BaseHero):
             #   hero.move(cord.x, cord.y, cord.z)
             # Test 2: Works
             ItemFunctions.buy_suitable_item(hero, Dota2Role.CARRY, self._items_list, Dota2Attribute.BONUS_STRENGTH)
-            cord = self._shared_functions.get_closest_friendly_tower_position(hero, world)
-            hero.move(cord.x, cord.y, cord.z)
 
             if not hero.is_alive():
                 hero.buyback()
@@ -91,7 +89,7 @@ class SniperMid(BaseHero):
             return
         if self._shared_functions.attack_enemy_hero(hero, world):
             if self._shared_functions.attacked_by_tower(hero, world):
-                pos = self._shared_functions.get_closest_friendly_tower_position(hero, world)
+                pos = self._shared_functions.get_closest_allied_tower_position(hero, world)
                 # overwrite attack commando
                 hero.move(pos.x, pos.y, pos.z)
             return
