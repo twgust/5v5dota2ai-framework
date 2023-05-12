@@ -2855,7 +2855,32 @@
     "qual": "epic",
     "cost": 6800,
     "notes": "",
-    "attrib": [],
+    "attrib": [
+      {
+      "key": "bonus_damage",
+      "header": "+",
+      "value": "25",
+      "footer": "Damage"
+      },
+      {
+      "key": "bonus_attack_speed",
+      "header": "+",
+      "value": "30",
+      "footer": "Attack Speed"
+      },
+      {
+      "key": "bonus_intellect",
+      "header": "+",
+      "value": "25",
+      "footer": "Intelligence"
+      },
+      {
+      "key": "bonus_mana_regen",
+      "header": "+",
+      "value": "5.5",
+      "footer": "Mana Regeneration"
+      }
+    ],
     "mc": 100,
     "cd": 15,
     "lore": "A reviled blade that bites deeper with each wriggle of its victim's final throes.",
@@ -3141,7 +3166,26 @@
     "qual": "epic",
     "cost": 4450,
     "notes": "Self-cast will use Hurricane Pike on yourself.\nHurricane Pike doesn't interrupt the target's actions.\nWill not work on a unit inside Chronosphere, Duel, or Black Hole.",
-    "attrib": [],
+    "attrib": [
+      {
+      "key": "bonus_agility",
+      "header": "+",
+      "value": "20",
+      "footer": "Agility"
+      },
+      {
+      "key": "bonus_strength",
+      "header": "+",
+      "value": "12",
+      "footer": "Strength"
+      },
+      {
+      "key": "bonus_intellect",
+      "header": "+",
+      "value": "10",
+      "footer": "Intelligence"
+      }
+    ],
     "mc": 150,
     "cd": 19,
     "lore": "A legendary pike once held as royal sigil of the ancient wyvern riders.",
@@ -3682,7 +3726,26 @@
     "qual": "epic",
     "cost": 4050,
     "notes": "Purchasing another Black King Bar will not reset its immunity duration.\nAbilities that pierce magic immunity will work fully even when Avatar is activated",
-    "attrib": [],
+    "attrib": [
+      {
+      "key": "bonus_strength",
+      "header": "+",
+      "value": "10",
+      "footer": "Strength"
+      },
+      {
+      "key": "bonus_damage",
+      "header": "+",
+      "value": "24",
+      "footer": "Damage"
+      },
+      {
+      "key": "bonus_spell_resist",
+      "header": "+",
+      "value": "40%",
+      "footer": "Spell Resistance"
+      }
+    ],
     "mc": 50,
     "cd": 90,
     "lore": "A powerful staff imbued with the strength of giants.",
@@ -4516,7 +4579,32 @@
     "qual": "epic",
     "cost": 4700,
     "notes": "",
-    "attrib": [],
+    "attrib": [
+      {
+      "key": "bonus_damage",
+      "header": "+",
+      "value": "65",
+      "footer": "Damage"
+      },
+      {
+      "key": "bonus_armor",
+      "header": "+",
+      "value": "8",
+      "footer": "Armor"
+      },
+      {
+      "key": "aura_damage",
+      "header": "Aura Damage:",
+      "value": "65",
+      "footer": ""
+      },
+      {
+      "key": "aura_radius",
+      "header": "Aura Radius:",
+      "value": "700",
+      "footer": ""
+      }
+    ],
     "mc": false,
     "cd": false,
     "lore": "A divine weapon that causes damage and a bright burning effect that lays waste to nearby enemies.",
@@ -4950,7 +5038,38 @@
     "qual": "artifact",
     "cost": 4100,
     "notes": "Yasha-based movement speed bonuses from multiple items do not stack.",
-    "attrib": [],
+    "attrib": [
+      {
+"key": "bonus_strength",
+"header": "+",
+"value": "16",
+"footer": "Strength"
+},
+{
+"key": "bonus_agility",
+"header": "+",
+"value": "16",
+"footer": "Agility"
+},
+{
+"key": "bonus_attack_speed",
+"header": "+",
+"value": "16",
+"footer": "Attack Speed"
+},
+{
+"key": "bonus_damage",
+"header": "+",
+"value": "16",
+"footer": "Damage"
+},
+{
+"key": "bonus_movement_speed",
+"header": "+",
+"value": "12",
+"footer": "Movement Speed"
+}
+    ],
     "mc": false,
     "cd": false,
     "lore": "Sange and Yasha, when attuned by the moonlight and used together, become a very powerful combination.",
@@ -5008,7 +5127,26 @@
     "qual": "artifact",
     "cost": 5050,
     "notes": "",
-    "attrib": [],
+    "attrib": [
+      {
+      "key": "bonus_strength",
+      "header": "+",
+      "value": "25",
+      "footer": "Strength"
+      },
+      {
+      "key": "bonus_damage",
+      "header": "+",
+      "value": "55",
+      "footer": "Damage"
+      },
+      {
+      "key": "lifesteal",
+      "header": "+",
+      "value": "25",
+      "footer": "% Lifesteal"
+      }
+    ],
     "mc": false,
     "cd": 30,
     "lore": "Immense power at the cost of your soul.",
@@ -5292,7 +5430,20 @@
     "qual": "artifact",
     "cost": 3500,
     "notes": "Armor reduction works on buildings.",
-    "attrib": [],
+    "attrib": [
+      {
+      "key": "bonus_damage",
+      "header": "+",
+      "value": "60",
+      "footer": "Damage"
+      },
+      {
+      "key": "bonus_attack_speed",
+      "header": "+",
+      "value": "45",
+      "footer": "Attack Speed"
+      }
+    ],
     "mc": false,
     "cd": false,
     "lore": "A wicked weapon, used in torturing political criminals.",
@@ -5366,7 +5517,18 @@
     "qual": "artifact",
     "cost": 1775,
     "notes": "",
-    "attrib": [],
+    "attrib": [
+      {
+        "key": "bonus_damage",
+        "value": "20",
+        "footer": "Damage"
+      },
+      {
+        "key": "bonus_attack_speed",
+        "value": "25",
+        "footer": "Attack Speed"
+      }
+    ],
     "mc": 25,
     "cd": 16,
     "lore": "Once this mask is worn, its bearer becomes an uncontrollable aggressive force.",
@@ -5402,7 +5564,20 @@
     "qual": "artifact",
     "cost": 2500,
     "notes": "Does not stack with other diffusal blades.",
-    "attrib": [],
+    "attrib": [
+      {
+      "key": "bonus_agility",
+      "header": "+",
+      "value": "20",
+      "footer": "Agility"
+      },
+      {
+      "key": "bonus_intellect",
+      "header": "+",
+      "value": "14",
+      "footer": "Intelligence"
+      }
+    ],
     "mc": false,
     "cd": 15,
     "lore": "An enchanted blade that allows the user to cut straight into the enemy's soul.",
@@ -5473,7 +5648,26 @@
     "qual": "epic",
     "cost": 4650,
     "notes": "Shares cooldown with Ghost Scepter.\nEthereal units take -40% bonus magic damage.\nFor Universal Heroes, their primary attribute is 60% the sum of all their attributes.\nUsing a Town Portal Scroll or Boots of Travel will not dispel Ethereal Form.",
-    "attrib": [],
+    "attrib": [
+      {
+      "key": "bonus_agility",
+      "header": "+",
+      "value": "40",
+      "footer": "Agility"
+      },
+      {
+      "key": "bonus_strength",
+      "header": "+",
+      "value": "10",
+      "footer": "Strength"
+      },
+      {
+      "key": "bonus_intelligence",
+      "header": "+",
+      "value": "10",
+      "footer": "Intelligence"
+      }
+    ],
     "mc": 100,
     "cd": 22,
     "lore": "A flickering blade of a ghastly nature, it is capable of dealing damage in both magical and physical planes.",

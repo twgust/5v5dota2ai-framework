@@ -1,5 +1,10 @@
 from typing import Literal, TypedDict, Union, cast
+
+from bots.hero_bots import ItemFunctions, Dota2PlayerHeroRole, Dota2ItemAttribute
+from bots.hero_bots.Dota2ItemAttribute import Dota2Attribute
+from bots.hero_bots.Dota2PlayerHeroRole import Dota2Role
 from bots.hero_bots.SharedFunctions import SharedFunctions
+from bots.test_bots.design.abstraction.ItemsList import ItemsList
 from game.building import Building
 from game.physical_entity import PhysicalEntity
 from game.rune import Rune
@@ -117,6 +122,7 @@ class TestBotBasicSmart(BaseBot):
     _go_aggressive_step1: bool
     _go_aggressive_step2: bool
     _shared_functions: SharedFunctions = SharedFunctions()
+    _items = ItemsList = ItemsList()
 
     def __init__(self, world: World) -> None:
         team: int = world.get_team()
@@ -182,7 +188,8 @@ class TestBotBasicSmart(BaseBot):
             if hero.get_buyback_cooldown_time() == 0 and hero.get_gold() >= hero.get_buyback_cost():
                 hero.buyback()
                 return"""
-
+        attributes = [Dota2Attribute.BONUS_DAMAGE, Dota2Attribute.BONUS_ATTACK_SPEED, Dota2Attribute.BONUS_LIFESTEAL]
+        ItemFunctions.buy_suitable_item(hero, Dota2Role.CARRY, attributes, self._items)
         if hero.get_stash_items():
             print("Has stash items")
             for item in hero.get_stash_items():

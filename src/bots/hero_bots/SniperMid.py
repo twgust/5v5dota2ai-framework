@@ -62,12 +62,6 @@ class SniperMid(BaseHero):
     def get_move(self, hero: PlayerHero, game_ticks: int, world: World) -> None:
         """Get a move generated from this specific hero, takes the hero object and current world object as parameter"""
         if world.get_team() == RADIANT_TEAM:
-            # Test 1: Works
-            #   cord = self._shared_functions.get_pushing_creeps_for_lane_pos(hero, world, "mid")
-            #   hero.move(cord.x, cord.y, cord.z)
-            # Test 2: Works
-            ItemFunctions.buy_suitable_item(hero, Dota2Role.CARRY, self._items_list, Dota2Attribute.BONUS_STRENGTH)
-
             if not hero.is_alive():
                 hero.buyback()
             else:

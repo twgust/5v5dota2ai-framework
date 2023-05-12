@@ -103,7 +103,7 @@ def buy_max_build_item(potential_items: list[Dota2Item], hero: PlayerHero) -> bo
     return False
 
 
-def buy_suitable_item(hero: PlayerHero, role: Dota2Role, item_lists: ItemsList, attribute: Dota2Attribute) -> bool:
+def buy_suitable_item(hero: PlayerHero, role: Dota2Role, attributes: list[Dota2Attribute], item_lists: ItemsList) -> bool:
     items = []
     if role == Dota2Role.CARRY:
         items = item_lists.get_carry_items()
@@ -111,22 +111,18 @@ def buy_suitable_item(hero: PlayerHero, role: Dota2Role, item_lists: ItemsList, 
         items = item_lists.get_support_items()
     else:
         return False
-    calculate_highest_score(hero, items, role, attribute)
+    calculate_highest_score(hero, role, attributes, items)
     return True
 
 
-def calculate_highest_score(hero: PlayerHero, item_list: list[Dota2Item], role: Dota2Role,
-                            attribute: Dota2Attribute) -> float:
+def calculate_highest_score(hero: PlayerHero, role: Dota2Role, attributes: list[Dota2Attribute], item_lists: list[Dota2Item]) -> float:
     """
     This function calculates the highest score among the items in the item_list passed in the argument,
     for the given hero. It takes a list of potential_items (a list of Dota2Item objects) and a hero (a PlayerHero object)
     as input parameters and returns a boolean value indicating if the purchase was successful or not.
-
-    :param potential_items: A list of potential Dota2Item objects that the hero can buy.
-    :param hero: A PlayerHero object representing the hero who wants to buy the item.
     """
-    if item_list:
-        max_score_item = max(item_list, key=lambda item: calculate_item_score(hero, item, role, attribute))
+    if item_lists:
+        max_score_item = max(item_lists, key=lambda item: calculate_item_score(hero, item, role, attributes))
         if max_score_item is not None:
             if max_score_item.name not in [item.name for item in hero.get_items()]:
                 if isinstance(max_score_item, RecipeItem):
@@ -137,7 +133,7 @@ def calculate_highest_score(hero: PlayerHero, item_list: list[Dota2Item], role: 
     return False
 
 
-def calculate_item_score(hero: PlayerHero, item: Dota2Item, role: Dota2Role, attribute: Dota2Attribute) -> float:
+def calculate_item_score(hero: PlayerHero, item: Dota2Item, role: Dota2Role, attribute: list[Dota2Attribute]) -> float:
     """
     hero (PlayerHero): The hero who's doing the purchasing
     item (Dota2Item): The item that the hero wishes to purchase
@@ -151,7 +147,7 @@ def calculate_item_score(hero: PlayerHero, item: Dota2Item, role: Dota2Role, att
     return 0
 
 
-def calculate_carry_item_score(hero: PlayerHero, item: Dota2Item, attribute: Dota2Attribute) -> float:
+def calculate_carry_item_score(hero: PlayerHero, item: Dota2Item, attribute: list[Dota2Attribute]) -> float:
     """
     hero (PlayerHero): The hero who's doing the purchasing
     item (Dota2Item): The item that the hero wishes to purchase
@@ -159,25 +155,34 @@ def calculate_carry_item_score(hero: PlayerHero, item: Dota2Item, attribute: Dot
     """
     score = 0
     bonus_damage_weight = 2.0
+    print("BEGIN: " + item.name)
+    pprint(item.attribute)
     # Add 2 points for every point of the desired attribute
-    if str(attribute.value) in item.attribute.keys():
-        score += float(item.attribute[str(attribute.value)]) * 2
+    for attribute in attribute:
+        if str(attribute.value) in item.attribute.keys():
+            score += float(item.attribute[str(attribute.value)]) * 2
 
     # Add 2 points for every bonus damage point
     if "bonus_damage" in item.attribute.keys():
         score += bonus_damage_weight
+        print("----bonus_damage " + str(score))
 
     # Add 1 point for every 10 attack speed points
     if "bonus_attack_speed" in item.attribute.keys():
         score += float(item.attribute["bonus_attack_speed"]) // 10
+        print("----bonus_attack_speed " + str(score))
 
     # Add 1 point for every 3% lifesteal
     if "lifesteal_percent" in item.attribute.keys():
         score += float(item.attribute["lifesteal_percent"]) // 3
+        print("----lifesteal_percent " + str(score))
 
     # Add 1 point for every 3 points of armor
     if "bonus_armor" in item.attribute.keys():
         score += float(item.attribute["bonus_armor"]) // 3
+        print("----bonus_armor " + str(score))
+    print(item.name + ", score: " + str(score))
+    print("END")
     return score
 
 
