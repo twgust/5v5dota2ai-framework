@@ -103,33 +103,66 @@ def buy_max_build_item(potential_items: list[Dota2Item], hero: PlayerHero) -> bo
     return False
 
 
-def buy_suitable_item(hero: PlayerHero, role: Dota2Role, attributes: list[Dota2Attribute], item_lists: ItemsList) -> bool:
+def hero_has_item(hero: PlayerHero, item: Dota2Item) -> bool:
+    """
+    This function checks if the given hero has the given item in their inventory.
+    It takes a hero (a PlayerHero object) and an item (a Dota2Item object) as input parameters
+    and returns a boolean value indicating if the item is in the hero's inventory or not.
+    """
+    if item.name in [item.name for item in hero.get_items()]:
+        return False
+    return True
+
+
+def get_affordable_items(hero: PlayerHero, items: list[Dota2Item]) -> list[Dota2Item]:
+    """
+    This function returns a list of items that the hero can afford to buy.
+    It takes a hero (a PlayerHero object) and a list of items (a list of Dota2Item objects) as input parameters
+    and returns a list of affordable items (a list of Dota2Item objects).
+    """
+    affordable_items = [item for item in items if item.get_cost() <= hero.get_gold()]
+    pprint(affordable_items)
+    return affordable_items
+
+
+def buy_suitable_item(hero: PlayerHero, role: Dota2Role, attributes: list[Dota2Attribute],
+                      item_lists: ItemsList) -> bool:
     items = []
     if role == Dota2Role.CARRY:
         items = item_lists.get_carry_items()
+        #items = item_lists.get_carry_items()
     elif role == Dota2Role.SUPPORT:
         items = item_lists.get_support_items()
     else:
         return False
-    calculate_highest_score(hero, role, attributes, items)
-    return True
+
+    return buy_highest_score_item(hero, role, attributes, items)
 
 
-def calculate_highest_score(hero: PlayerHero, role: Dota2Role, attributes: list[Dota2Attribute], item_lists: list[Dota2Item]) -> float:
+def buy_highest_score_item(hero: PlayerHero, role: Dota2Role, attributes: list[Dota2Attribute],
+                           item_list: list[Dota2Item]) -> bool:
     """
     This function calculates the highest score among the items in the item_list passed in the argument,
     for the given hero. It takes a list of potential_items (a list of Dota2Item objects) and a hero (a PlayerHero object)
     as input parameters and returns a boolean value indicating if the purchase was successful or not.
     """
-    if item_lists:
-        max_score_item = max(item_lists, key=lambda item: calculate_item_score(hero, item, role, attributes))
+    affordable_items = get_affordable_items(hero, item_list)
+    if affordable_items:
+        max_score_item = max(affordable_items, key=lambda item: calculate_item_score(hero, item, role, attributes))
         if max_score_item is not None:
-            if max_score_item.name not in [item.name for item in hero.get_items()]:
-                if isinstance(max_score_item, RecipeItem):
-                    hero.buy_combined(generate_item_list(max_score_item))
-                else:
-                    hero.buy(max_score_item.name)
+            print("MAX SCORE AFFORDABLE ITEM = " + max_score_item.name)
+            print("HERO DOESN'T HAVE ITEM")
+            if isinstance(max_score_item, RecipeItem):
+                print("BUYING RECIPE ITEM")
+                hero.buy_combined(generate_item_list(max_score_item))
                 return True
+
+            else:
+                print("BUYING NON-RECIPE ITEM")
+                hero.buy(max_score_item.name)
+                return True
+
+    print("RETURNING FALSE")
     return False
 
 
@@ -182,7 +215,7 @@ def calculate_carry_item_score(hero: PlayerHero, item: Dota2Item, attribute: lis
         score += float(item.attribute["bonus_armor"]) // 3
         print("----bonus_armor " + str(score))
     print(item.name + ", score: " + str(score))
-    print("END")
+    print("END\n")
     return score
 
 

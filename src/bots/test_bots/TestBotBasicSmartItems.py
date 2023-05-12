@@ -1,5 +1,10 @@
 from typing import Literal, TypedDict, Union, cast
+
+from bots.hero_bots import ItemFunctions
+from bots.hero_bots.Dota2ItemAttribute import Dota2Attribute
+from bots.hero_bots.Dota2PlayerHeroRole import Dota2Role
 from bots.hero_bots.SharedFunctions import SharedFunctions
+from bots.test_bots.design.abstraction.ItemsList import ItemsList
 from game.building import Building
 from game.physical_entity import PhysicalEntity
 from game.rune import Rune
@@ -25,6 +30,8 @@ BOT: int = 2
 class HeroData(TypedDict):
     boots: Union[Literal[0], Literal[1]]
     lane: Union[Literal[0], Literal[1], Literal[2]]
+    role: str
+    attribute: str
 
 
 party: dict[int, dict[str, HeroData]] = {
@@ -32,44 +39,64 @@ party: dict[int, dict[str, HeroData]] = {
         "npc_dota_hero_abaddon": {
             "boots": ARCANE,
             "lane": TOP,
+            "role": "support",
+            "attribute": "universal"
         },
         "npc_dota_hero_axe": {
             "boots": PHASE,
             "lane": TOP,
+            "role": "core",
+            "attribute": "strength"
         },
         "npc_dota_hero_batrider": {
             "boots": ARCANE,
             "lane": MID,
+            "role": "core",
+            "attribute": "universal"
         },
         "npc_dota_hero_bane": {
             "boots": ARCANE,
             "lane": BOT,
+            "role": "support",
+            "attribute": "universal"
         },
         "npc_dota_hero_disruptor": {
             "boots": ARCANE,
             "lane": BOT,
+            "role": "support",
+            "attribute": "intellect"
         },
     },
     DIRE_TEAM: {
         "npc_dota_hero_ancient_apparition": {
             "boots": ARCANE,
             "lane": TOP,
+            "role": "support",
+            "attribute": "intellect"
         },
         "npc_dota_hero_alchemist": {
             "boots": PHASE,
             "lane": TOP,
+            "role": "core",
+            "attribute": "strength"
         },
         "npc_dota_hero_dragon_knight": {
             "boots": PHASE,
             "lane": MID,
+            "role": "core",
+            "attribute": "strength"
         },
         "npc_dota_hero_ogre_magi": {
             "boots": ARCANE,
             "lane": BOT,
+            "role": "support",
+            "attribute": "universal"
         },
         "npc_dota_hero_bristleback": {
             "boots": PHASE,
             "lane": BOT,
+            "role": "core",
+            "attribute": "strength"
         },
     },
 }
@@ -117,6 +144,7 @@ class TestBotBasicSmartItems(BaseBot):
     _go_aggressive_step1: bool
     _go_aggressive_step2: bool
     _shared_functions: SharedFunctions = SharedFunctions()
+    _items: ItemsList = ItemsList()
 
     def __init__(self, world: World) -> None:
         team: int = world.get_team()
@@ -182,6 +210,10 @@ class TestBotBasicSmartItems(BaseBot):
             if hero.get_buyback_cooldown_time() == 0 and hero.get_gold() >= hero.get_buyback_cost():
                 hero.buyback()
                 return"""
+        if game_ticks % 100 == 0:
+            attributes = [Dota2Attribute.BONUS_DAMAGE, Dota2Attribute.BONUS_ATTACK_SPEED, Dota2Attribute.BONUS_LIFESTEAL]
+            if ItemFunctions.buy_suitable_item(hero, Dota2Role.CARRY, attributes, self._items):
+                return
 
         if hero.get_stash_items():
             print("Has stash items")
@@ -202,6 +234,9 @@ class TestBotBasicSmartItems(BaseBot):
 
         if self.buy_tp_scroll(hero):
             return
+
+        if hero.get_gold() > 2000: #ITEM BUYING ALGO
+            pass
 
         # if self.place_observer_ward(hero):
         #     return
