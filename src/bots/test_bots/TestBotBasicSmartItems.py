@@ -1,5 +1,6 @@
 from typing import Literal, TypedDict, Union, cast
 
+import tests.test_bot_framework
 from bots.hero_bots import ItemFunctions
 from bots.hero_bots.Dota2ItemAttribute import Dota2Attribute
 from bots.hero_bots.Dota2PlayerHeroRole import Dota2Role
@@ -226,10 +227,13 @@ class TestBotBasicSmartItems(BaseBot):
             hero.buy("item_boots")
             return
 
-        if self.courier_has_items(hero):
-            if self.courier_transfer_all_items(hero):
-                return
-            return
+        # if hero.get_gold() >= 200:
+        #  hero.buy("item_quelling_blade")
+        #    return
+        if game_ticks % 25 == 0:
+            if self.courier_has_items(hero):
+                if self.courier_transfer_all_items(hero):
+                    return
 
         if self.buy_tp_scroll(hero):
             return
@@ -266,17 +270,35 @@ class TestBotBasicSmartItems(BaseBot):
 
     def courier_has_items(self, hero: PlayerHero) -> bool:
         courier = self._world.get_entity_by_id(hero.get_courier_id())
-        if len(courier.get_items()) > 0:
-            return True
+        if isinstance(courier, Courier):
+            if len(courier.get_items()) > 0:
+                print(hero.get_name(), "has items on courier")
+                for item in courier.get_items():
+                    print("---" + item.get_name())
+                return True
         return False
 
     def courier_transfer_all_items(self, hero: PlayerHero) -> bool:
-        if not self._courier_transferring_items[hero.get_name()]:
-            hero.courier_transfer_items()
-            self._courier_transferring_items[hero.get_name()] = True
-            self._courier_moving_to_secret_shop[hero.get_name()] = False
+        if self.is_courier_transferring_items(hero):
+            return False
+        else:
+            if self._courier_transferring_items[hero.get_name()]:
+                return False
+            else:
+                print("TRANSFERRING MY ITEMS :)")
+                self._courier_transferring_items[hero.get_name()] = True
+                self._courier_moving_to_secret_shop[hero.get_name()] = False
+                hero.courier_transfer_items()
+                return True
+
+    def is_courier_transferring_items(self, hero: PlayerHero) -> bool:
+        courier = self._world.get_entity_by_id(hero.get_courier_id())
+        if isinstance(courier, Courier):
+            if courier.is_in_range_of_home_shop():
+                print("courier is not transferring items")
+                self._courier_transferring_items[hero.get_name()] = False
+                return False
             return True
-        return False
 
     def pick_up_rune_with_bottle(self, hero: PlayerHero) -> bool:
         bottle_slot: int = self.get_item_slot_by_name(hero, "item_bottle")

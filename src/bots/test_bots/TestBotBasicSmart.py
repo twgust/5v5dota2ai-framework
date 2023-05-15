@@ -188,8 +188,8 @@ class TestBotBasicSmart(BaseBot):
             if hero.get_buyback_cooldown_time() == 0 and hero.get_gold() >= hero.get_buyback_cost():
                 hero.buyback()
                 return"""
-        attributes = [Dota2Attribute.BONUS_DAMAGE, Dota2Attribute.BONUS_ATTACK_SPEED, Dota2Attribute.BONUS_LIFESTEAL]
-        ItemFunctions.buy_suitable_item(hero, Dota2Role.CARRY, attributes, self._items)
+        #attributes = [Dota2Attribute.BONUS_DAMAGE, Dota2Attribute.BONUS_ATTACK_SPEED, Dota2Attribute.BONUS_LIFESTEAL]
+        #ItemFunctions.buy_suitable_item(hero, Dota2Role.CARRY, attributes, self._items)
         if hero.get_stash_items():
             print("Has stash items")
             for item in hero.get_stash_items():

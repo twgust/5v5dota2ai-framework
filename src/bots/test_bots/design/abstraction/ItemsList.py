@@ -62,7 +62,7 @@ class ItemsList:
 
     def load_carry_items(self) -> list[Dota2Item]:
         fetched_items = []
-        for item_name in ["item_orb_of_corrosion", "item_battle_fury", "item_black_king_bar", "item_butterfly",
+        for item_name in ["item_magic_wand", "item_orb_of_corrosion", "item_battle_fury", "item_black_king_bar", "item_butterfly",
                           "item_daedalus", "item_desolator", "item_eye_of_skadi",
                           "item_monkey_king_bar", "item_manta_style", "item_satanic",
                           "item_abyssal_blade", "item_divine_rapier", "item_mask_of_madness",

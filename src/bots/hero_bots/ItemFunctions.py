@@ -152,7 +152,6 @@ def buy_highest_score_item(hero: PlayerHero, role: Dota2Role, attributes: list[D
         max_score_item = max(affordable_items, key=lambda item: calculate_item_score(hero, item, role, attributes))
         if max_score_item is not None:
             print("MAX SCORE AFFORDABLE ITEM = " + max_score_item.name)
-            print("HERO DOESN'T HAVE ITEM")
             if isinstance(max_score_item, RecipeItem):
                 print("BUYING RECIPE ITEM")
                 hero.buy_combined(generate_item_list(max_score_item))
