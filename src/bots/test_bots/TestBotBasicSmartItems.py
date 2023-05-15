@@ -211,16 +211,10 @@ class TestBotBasicSmartItems(BaseBot):
                 hero.buyback()
                 return"""
         if game_ticks % 100 == 0:
-            attributes = [Dota2Attribute.BONUS_DAMAGE, Dota2Attribute.BONUS_ATTACK_SPEED, Dota2Attribute.BONUS_LIFESTEAL]
+            attributes = [Dota2Attribute.BONUS_DAMAGE, Dota2Attribute.BONUS_ATTACK_SPEED,
+                          Dota2Attribute.BONUS_LIFESTEAL]
             if ItemFunctions.buy_suitable_item(hero, Dota2Role.CARRY, attributes, self._items):
                 return
-
-        if hero.get_stash_items():
-            print("Has stash items")
-            for item in hero.get_stash_items():
-                print(item.get_name())
-            hero.courier_retrieve()
-            return
 
         if game_ticks == 1:
             # if self.hero_name_match_any(hero, ["pugna"]):
@@ -232,10 +226,15 @@ class TestBotBasicSmartItems(BaseBot):
             hero.buy("item_boots")
             return
 
+        if self.courier_has_items(hero):
+            if self.courier_transfer_all_items(hero):
+                return
+            return
+
         if self.buy_tp_scroll(hero):
             return
 
-        if hero.get_gold() > 2000: #ITEM BUYING ALGO
+        if hero.get_gold() > 2000:  # ITEM BUYING ALGO
             pass
 
         # if self.place_observer_ward(hero):
@@ -262,6 +261,20 @@ class TestBotBasicSmartItems(BaseBot):
         if hero.get_gold() >= 100 and hero.is_in_range_of_home_shop() and hero.get_tp_scroll_charges() < 2:
             print(hero.get_name(), "is buying a tp scroll", hero.get_gold(), "gold", hero.get_tp_scroll_charges())
             hero.buy("item_tpscroll")
+            return True
+        return False
+
+    def courier_has_items(self, hero: PlayerHero) -> bool:
+        courier = self._world.get_entity_by_id(hero.get_courier_id())
+        if len(courier.get_items()) > 0:
+            return True
+        return False
+
+    def courier_transfer_all_items(self, hero: PlayerHero) -> bool:
+        if not self._courier_transferring_items[hero.get_name()]:
+            hero.courier_transfer_items()
+            self._courier_transferring_items[hero.get_name()] = True
+            self._courier_moving_to_secret_shop[hero.get_name()] = False
             return True
         return False
 

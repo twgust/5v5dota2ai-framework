@@ -1,4 +1,6 @@
 ## data structure for the class Dota2Item.py, represents a list of items. Initializes the list by using OpenDota2API.py to get the list of items from OpenDota2 API
+from pprint import pprint
+
 from bots.test_bots.design.abstraction.Dota2Item import Dota2Item
 import json
 import ijson
@@ -42,13 +44,11 @@ class ItemsList:
         self._items_support = self.load_support_items()
         self.generate_attribute_lists()
 
-        # self.openJsonFile('items.json')
-        # self.items_list = self.openJsonFile('items.json')
-        #  for item in self.items_list:
-        #     print(item)
-        # print("--------------------\n\n")
-        # self.parse_items_list(dict)
-        print("test")
+        # temp testing 05/15
+        for key, value in self._items_dict_recipe.items():
+            print(key)
+            for components in value.get_required_items():
+                print("------" + components.get_name())
 
     def get_attribute_list(self, attribute: str) -> list[Dota2Item]:
         if attribute == "Strength":

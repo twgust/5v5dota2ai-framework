@@ -12,6 +12,7 @@ from pprint import pprint
 def generate_item_list(item: RecipeItem) -> list:
     components = item.get_required_items()
     item_names_list = list(component.name for component in components)
+    pprint(item_names_list)
     return item_names_list
 
 
