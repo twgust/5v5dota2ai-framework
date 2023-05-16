@@ -328,12 +328,13 @@ def calculate_carry_item_score(hero: PlayerHero, item: Dota2Item, attribute: lis
     item (Dota2Item): The item that the hero wishes to purchase
     attribute (Dota2Attribute): The attribute that the hero wishes to prioritize
     """
-    score = 0
+    score = 1
     bonus_damage_weight = 2.0
     print("BEGIN: " + item.name)
     pprint(item.attribute)
     if hero_has_item(hero, item) or courier_has_item(hero, item, world):
         print("hero already has this item, skipping", item.name)
+        score = 0
         return score
 
     # Add 2 points for every point of the desired attribute
