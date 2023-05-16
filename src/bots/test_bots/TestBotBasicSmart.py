@@ -228,7 +228,7 @@ class TestBotBasicSmart(BaseBot):
         if self.use_phase_boots(hero):
             return
 
-        self.make_choice(hero)
+        self.make_choice(hero, game_ticks)
 
     def buy_tp_scroll(self, hero: PlayerHero) -> bool:
         if hero.get_gold() >= 100 and hero.is_in_range_of_home_shop() and hero.get_tp_scroll_charges() < 2:
@@ -359,10 +359,12 @@ class TestBotBasicSmart(BaseBot):
 
             return "dota_badguys_tower3_bot"
 
-    def make_choice(self, hero: PlayerHero) -> None:
+    def make_choice(self, hero: PlayerHero, game_ticks: int) -> None:
+
         if hero.get_level() < 27:  # Gets stuck here otherwise because handling talents in the tree is weird
-            if self.level_up_ability(hero):
-                return
+            if game_ticks % 30 == 0:
+                if self.level_up_ability(hero):
+                    return
 
         lane = party[self._world.get_team()][hero.get_name()]["lane"]
 

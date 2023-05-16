@@ -44,12 +44,6 @@ class ItemsList:
         self._items_support = self.load_support_items()
         self.generate_attribute_lists()
 
-        # temp testing 05/15
-        for key, value in self._items_dict_recipe.items():
-            print(key)
-            for components in value.get_required_items():
-                print("------" + components.get_name())
-
     def get_attribute_list(self, attribute: str) -> list[Dota2Item]:
         if attribute == "Strength":
             return self._items_list_strength
@@ -62,7 +56,7 @@ class ItemsList:
 
     def load_carry_items(self) -> list[Dota2Item]:
         fetched_items = []
-        for item_name in ["item_magic_wand", "item_battle_fury", "item_black_king_bar", "item_butterfly",
+        for item_name in ["item_arcane_boots", "item_battle_fury", "item_black_king_bar", "item_butterfly",
                           "item_daedalus", "item_desolator", "item_eye_of_skadi",
                           "item_monkey_king_bar", "item_manta_style", "item_satanic",
                           "item_abyssal_blade", "item_divine_rapier", "item_mask_of_madness",
@@ -172,6 +166,8 @@ class ItemsList:
             item.cost = 0
             return item
 
+    def is_secret_shop_items(self, item: str, data: dict) -> bool:
+        return "secret_shop" in data.get(item, {}).get("qual", [])
     def createRecipeItem(self, item: str, data: dict) -> RecipeItem:
         """
         This function attempts to create a RecipeItem object from the given item name and data dictionary. If the
@@ -199,9 +195,9 @@ class ItemsList:
                     temp_dota2_item_active_effect = True
                 temp_dota2_item_notes = data.get(component).get("hint")
                 temp_attrib_dict = self.create_item_attribute_dictionary(data, component)
-
+                secret_shop = self.is_secret_shop_items(component, data)
                 dota2_item = Dota2Item(temp_dota2_item_name, temp_dota2_item_cost, temp_dota2_item_active_effect,
-                                       temp_dota2_item_notes, temp_attrib_dict)
+                                       temp_dota2_item_notes, temp_attrib_dict, secret_shop)
                 required_items_list.append(dota2_item)
 
         recipe = self.find_recipe_for_item(item, data)
@@ -233,13 +229,10 @@ class ItemsList:
         recipe_item = None
         for json_item in data.keys():
             if json_item == "recipe_" + item:
-                return Dota2Item(str("item_recipe_" + item), data.get(json_item).get("cost"), False, None, None)
+                return Dota2Item(str("item_recipe_" + item), data.get(json_item).get("cost"), False, None, None, False)
         return None
 
-        # returns false if the item is a component of another item
-
-    # returns true if the item is not a component of another item
-    def isBaseItem(self, item: str, data: dict) -> bool:
+    def is_base_item(self, item: str, data: dict) -> bool:
         """
         This function checks if the given item is a component of another item. If it is, it returns false. If it is
         not, it returns true.
@@ -286,15 +279,13 @@ class ItemsList:
 
                 if attribs is None:
                     item_attribute = "None"
-                    # print(item_attribute)
                 else:
                     attrib_array = []
                     attrib_dict = self.create_item_attribute_dictionary(data, item)
-                # check to see if item is a base item,
-                # if it is, create a Dota2Item object,
-                # if not, create a RecipeItem object
-                if self.isBaseItem(item, data):
-                    dota2_item = Dota2Item(name, item_cost, item_has_active_effect, item_notes, attrib_dict)
+
+                if self.is_base_item(item, data):
+                    secret_shop = self.is_secret_shop_items(item, data)
+                    dota2_item = Dota2Item(name, item_cost, item_has_active_effect, item_notes, attrib_dict, secret_shop)
                     self.validateDota2Item(dota2_item)
                     itemlist.append(dota2_item)
                     self.add_to_dictionary(dota2_item)
@@ -303,7 +294,7 @@ class ItemsList:
                     recipe_item = self.createRecipeItem(item, data)
                     if recipe_item is not None:
                         self.validateDota2Item(recipe_item)
-                        itemlist.append(self.createRecipeItem(item, data))
+                        itemlist.append(recipe_item)
                         self.add_to_dictionary(recipe_item)
                         self._items_dict_recipe[recipe_item.name] = recipe_item
                 i = i + 1

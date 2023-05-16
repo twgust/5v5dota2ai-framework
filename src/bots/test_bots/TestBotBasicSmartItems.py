@@ -216,7 +216,7 @@ class TestBotBasicSmartItems(BaseBot):
                           Dota2Attribute.BONUS_LIFESTEAL]
             role = party[self._world.get_team()][hero.get_name()]["role"]  # Use to get specified role of the hero
             attribute = party[self._world.get_team()][hero.get_name()]["attribute"]  # Use to get specified attribute of the hero
-            if ItemFunctions.buy_suitable_item(hero, Dota2Role.CARRY, attributes, self._items):
+            if ItemFunctions.buy_suitable_item(hero, Dota2Role.CARRY, attributes, self._items, self._world):
                 return
 
         if game_ticks == 1:
@@ -252,16 +252,16 @@ class TestBotBasicSmartItems(BaseBot):
         # if self.pick_up_rune_with_bottle(hero):
         #     return
 
-        if self.get_better_boots(hero):
-            return
+        #if self.get_better_boots(hero):
+          #  return
 
         if self.use_arcane_boots(hero):
             return
 
-        if self.use_phase_boots(hero):
-            return
+        #if self.use_phase_boots(hero):
+           # return
 
-        self.make_choice(hero)
+        self.make_choice(hero, game_ticks)
 
     def buy_tp_scroll(self, hero: PlayerHero) -> bool:
         if hero.get_gold() >= 100 and hero.is_in_range_of_home_shop() and hero.get_tp_scroll_charges() < 2:
@@ -284,12 +284,14 @@ class TestBotBasicSmartItems(BaseBot):
         if self.is_courier_transferring_items(hero):
             return False
         else:
-            if self._courier_transferring_items[hero.get_name()]:
+            if hero._courier_transferring_items:
                 return False
             else:
                 print("TRANSFERRING MY ITEMS :)")
                 self._courier_transferring_items[hero.get_name()] = True
                 self._courier_moving_to_secret_shop[hero.get_name()] = False
+                hero.set_courier_transferring_items(True)
+                hero.set_courier_moving_to_secret_shop(False)
                 hero.courier_transfer_items()
                 return True
 
@@ -299,6 +301,7 @@ class TestBotBasicSmartItems(BaseBot):
             if courier.is_in_range_of_home_shop() or courier.is_in_range_of_secret_shop():
                 print("courier is not transferring items")
                 self._courier_transferring_items[hero.get_name()] = False
+                hero.set_courier_transferring_items(False)
                 return False
             return True
 
@@ -425,10 +428,11 @@ class TestBotBasicSmartItems(BaseBot):
 
             return "dota_badguys_tower3_bot"
 
-    def make_choice(self, hero: PlayerHero) -> None:
+    def make_choice(self, hero: PlayerHero, game_tick: int) -> None:
         if hero.get_level() < 27:  # Gets stuck here otherwise because handling talents in the tree is weird
-            if self.level_up_ability(hero):
-                return
+            if game_tick % 30 == 0:
+                if self.level_up_ability(hero):
+                    return
 
         lane = party[self._world.get_team()][hero.get_name()]["lane"]
 

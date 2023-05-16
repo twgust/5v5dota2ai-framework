@@ -10,7 +10,7 @@ from bots.test_bots.design.abstraction.Dota2Item import Dota2Item
 class RecipeItem(Dota2Item):
     def __init__(self, name: str, cost: int, is_active: bool, notes: str,
                  attribute: dict[str, str], required_items: list[Dota2Item]):
-        super().__init__(name, cost, is_active, notes, attribute)
+        super().__init__(name, cost, is_active, notes, attribute, None)
         self.required_items = required_items
 
     def get_required_items(self) -> list[Dota2Item]:

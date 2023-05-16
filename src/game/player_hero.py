@@ -41,11 +41,16 @@ class PlayerHero(Hero):
     _items: list[Item]
     _stash_items: list[Item]
 
+    _courier_moving_to_secret_shop: bool
+    _courier_transferring_items: bool
+
     _command: Union[dict[str, CommandProps], None]
     _commands: list[dict[str, CommandProps]]
 
     def __init__(self, entity_id: str):
         super().__init__(entity_id)
+        self.set_courier_transferring_items(False)
+        self.set_courier_moving_to_secret_shop(False)
         self._command = None
         self._commands = []
 
@@ -69,6 +74,17 @@ class PlayerHero(Hero):
         self._set_stash_items(player_hero_data)
         self._set_abilities(player_hero_data)
 
+    def set_courier_moving_to_secret_shop(self, is_moving: bool):
+        self._courier_moving_to_secret_shop = is_moving
+
+    def set_courier_transferring_items(self, is_transferring: bool):
+        self._courier_transferring_items = is_transferring
+
+    def get_courier_transferring_items(self) -> bool:
+        return self._courier_transferring_items
+
+    def get_courier_moving_to_secret_shop(self) -> bool:
+        return self._courier_moving_to_secret_shop
     def _set_items(self, player_hero_data: IPlayerHero) -> None:
         self._items = []
 
@@ -214,7 +230,8 @@ class PlayerHero(Hero):
             }
         }
 
-    def cast(self, ability_index: int, target: Union[str, PhysicalEntity] = "-1", position: Union[Position, None] = None) -> None:
+    def cast(self, ability_index: int, target: Union[str, PhysicalEntity] = "-1",
+             position: Union[Position, None] = None) -> None:
         if position is None:
             position = Position(0, 0, 0)
 
@@ -304,7 +321,8 @@ class PlayerHero(Hero):
             }
         }
 
-    def use_item(self, slot: int, target: Union[str, PhysicalEntity] = "-1", position: Union[Position, None] = None) -> None:
+    def use_item(self, slot: int, target: Union[str, PhysicalEntity] = "-1",
+                 position: Union[Position, None] = None) -> None:
         """
         Pass a target or target id for an item with a targeted ability.
         

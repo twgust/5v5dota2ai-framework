@@ -130,7 +130,7 @@ class SharedFunctions:
                     lowest_health = unit_health
         return lowest_health_unit
 
-    def get_pushing_creeps_position(self, hero: Hero, world: World, target_lane: str):
+    def get_pushing_creeps_position(self, hero: Hero, world: World, target_lane: str) -> Position:
         friendly_creeps = world.get_allied_creeps_of(hero)
         closest_creep = None
         closest_distance = float('inf')
@@ -171,6 +171,7 @@ class SharedFunctions:
                     return True
                 else:
                     return False
+    # -----------------------------
 
     def attack_enemy_hero(self, hero: PlayerHero, world: World) -> bool:
         enemy_hero_to_attack = self.get_enemy_hero_to_attack(hero, world)
