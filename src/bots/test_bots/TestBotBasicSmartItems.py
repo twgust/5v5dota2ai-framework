@@ -40,31 +40,31 @@ party: dict[int, dict[str, HeroData]] = {
         "npc_dota_hero_abaddon": {
             "boots": ARCANE,
             "lane": TOP,
-            "role": "support",
+            "role": Dota2Role.SUPPORT,
             "attribute": "universal"
         },
         "npc_dota_hero_axe": {
             "boots": PHASE,
             "lane": TOP,
-            "role": "core",
+            "role": Dota2Role.UTILITY,
             "attribute": "strength"
         },
         "npc_dota_hero_batrider": {
             "boots": ARCANE,
             "lane": MID,
-            "role": "core",
+            "role": Dota2Role.UTILITY,
             "attribute": "universal"
         },
         "npc_dota_hero_bane": {
             "boots": ARCANE,
             "lane": BOT,
-            "role": "support",
+            "role": Dota2Role.SUPPORT,
             "attribute": "universal"
         },
         "npc_dota_hero_disruptor": {
             "boots": ARCANE,
             "lane": BOT,
-            "role": "support",
+            "role": Dota2Role.SUPPORT,
             "attribute": "intellect"
         },
     },
@@ -72,31 +72,31 @@ party: dict[int, dict[str, HeroData]] = {
         "npc_dota_hero_ancient_apparition": {
             "boots": ARCANE,
             "lane": TOP,
-            "role": "support",
+            "role": Dota2Role.SUPPORT,
             "attribute": "intellect"
         },
         "npc_dota_hero_alchemist": {
             "boots": PHASE,
             "lane": TOP,
-            "role": "core",
+            "role": Dota2Role.CARRY,
             "attribute": "strength"
         },
         "npc_dota_hero_dragon_knight": {
             "boots": PHASE,
             "lane": MID,
-            "role": "core",
+            "role": Dota2Role.CARRY,
             "attribute": "strength"
         },
         "npc_dota_hero_ogre_magi": {
             "boots": ARCANE,
             "lane": BOT,
-            "role": "support",
+            "role": Dota2Role.SUPPORT,
             "attribute": "universal"
         },
         "npc_dota_hero_bristleback": {
             "boots": PHASE,
             "lane": BOT,
-            "role": "core",
+            "role": Dota2Role.UTILITY,
             "attribute": "strength"
         },
     },
@@ -214,6 +214,8 @@ class TestBotBasicSmartItems(BaseBot):
         if game_ticks % 100 == 0:
             attributes = [Dota2Attribute.BONUS_DAMAGE, Dota2Attribute.BONUS_ATTACK_SPEED,
                           Dota2Attribute.BONUS_LIFESTEAL]
+            role = party[self._world.get_team()][hero.get_name()]["role"]  # Use to get specified role of the hero
+            attribute = party[self._world.get_team()][hero.get_name()]["attribute"]  # Use to get specified attribute of the hero
             if ItemFunctions.buy_suitable_item(hero, Dota2Role.CARRY, attributes, self._items):
                 return
 

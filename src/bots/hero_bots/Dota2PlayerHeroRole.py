@@ -7,3 +7,4 @@ class Dota2Role(Enum):
     OFFLANE = 3
     SUPPORT = 4
     ROAMER = 5
+    UTILITY = 6
