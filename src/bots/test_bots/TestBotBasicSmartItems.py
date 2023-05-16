@@ -449,7 +449,6 @@ class TestBotBasicSmartItems(BaseBot):
                             and hero.get_level() >= ability.get_hero_level_required_to_level_up():
                         hero.level_up(ability.get_ability_index())
                         return True
-
         return False
 
     def level_up_ultimate(self, hero: PlayerHero) -> bool:
@@ -457,7 +456,8 @@ class TestBotBasicSmartItems(BaseBot):
             level_required = ability.get_hero_level_required_to_level_up()
             if (level_required == 6 or level_required == 12 or level_required == 18) \
                     and ability.get_level() < ability.get_max_level() \
-                    and hero.get_level() >= level_required:
+                    and hero.get_level() >= level_required \
+                    and ability.get_ability_index() < 9:
                 hero.level_up(ability.get_ability_index())
                 return True
 
