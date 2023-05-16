@@ -375,9 +375,6 @@ class TestBotBasicSmart(BaseBot):
 
     def level_up_ability(self, hero: PlayerHero) -> bool:
         if hero.get_ability_points() >= 1:
-            print(hero.get_name(), hero.get_level(), hero.get_ability_points(), hero.get_abilities()[0].get_level(),
-                  hero.get_abilities()[1].get_level(), hero.get_abilities()[2].get_level(),
-                  hero.get_abilities()[3].get_level())
             if self.level_up_ultimate(hero):
                 return True
 
