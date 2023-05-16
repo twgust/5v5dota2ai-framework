@@ -296,7 +296,7 @@ class TestBotBasicSmartItems(BaseBot):
     def is_courier_transferring_items(self, hero: PlayerHero) -> bool:
         courier = self._world.get_entity_by_id(hero.get_courier_id())
         if isinstance(courier, Courier):
-            if courier.is_in_range_of_home_shop():
+            if courier.is_in_range_of_home_shop() or courier.is_in_range_of_secret_shop():
                 print("courier is not transferring items")
                 self._courier_transferring_items[hero.get_name()] = False
                 return False
