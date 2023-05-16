@@ -26,6 +26,7 @@ class ItemsList:
 
     _items_carry: list[Dota2Item]
     _items_support: list[Dota2Item]
+    _items_utility: list[Dota2Item]
 
     def __init__(self):
         self._items_dict = {}
@@ -42,6 +43,7 @@ class ItemsList:
 
         self._items_carry = self.load_carry_items()
         self._items_support = self.load_support_items()
+        self._items_utility = self.load_utility_items()
         self.generate_attribute_lists()
 
     def get_attribute_list(self, attribute: str) -> list[Dota2Item]:
@@ -56,14 +58,15 @@ class ItemsList:
 
     def load_carry_items(self) -> list[Dota2Item]:
         fetched_items = []
-        for item_name in ["item_arcane_boots", "item_battle_fury", "item_black_king_bar", "item_butterfly",
-                          "item_daedalus", "item_desolator", "item_eye_of_skadi",
-                          "item_monkey_king_bar", "item_manta_style", "item_satanic",
-                          "item_abyssal_blade", "item_divine_rapier", "item_mask_of_madness",
-                          "item_assault_cuirass", "item_diffusal_blade", "item_hurricane_pike",
+        for item_name in ["item_phase_boots", "item_bfury", "item_black_king_bar", "item_butterfly",
+                          "item_greater_crit", "item_lesser_crit", "item_desolator", "item_skadi",
+                          "item_monkey_king_bar", "item_manta", "item_satanic",
+                          "item_abyssal_blade", "item_rapier", "item_mask_of_madness",
+                          "item_assault", "item_diffusal_blade", "item_hurricane_pike",
                           "item_sange_and_yasha", "item_heavens_halberd", "item_nullifier",
                           "item_bloodthorn", "item_ethereal_blade", "item_radiance",
-                          "item_heart_of_tarrasque", "item_armlet_of_mordiggian"]:
+                          "item_heart", "item_armlet", "item_falcon_blade", "item_sange",
+                          "item_yasha", "item_kaya", "item_echo_sabre", "item_maelstrom", "item_mjollnir"]:
 
             item = self._items_dict.get(item_name)
             if item:
@@ -76,19 +79,36 @@ class ItemsList:
     def load_support_items(self) -> list[Dota2Item]:
         support_items = []
 
-        for item_name in ["item_ward_observer", "item_ward_sentry", "item_smoke_of_deceit", "item_tome_of_knowledge",
-                          "item_glimmer_cape", "item_force_staff", "item_eul_scepter_of_divinity", "item_blink_dagger",
-                          "item_ghost_scepter", "item_aeon_disk", "item_medallion_of_courage", "item_solar_crest",
+        for item_name in ["item_arcane_boots", "item_headdress", "item_buckler", "item_mekansm",
+                          "item_glimmer_cape", "item_force_staff", "item_cyclone", "item_blink",
+                          "item_ghost", "item_aeon_disk", "item_medallion_of_courage", "item_solar_crest",
                           "item_urn_of_shadows", "item_spirit_vessel", "item_rod_of_atos", "item_lotus_orb",
-                          "item_cyclone", "item_black_king_bar"]:
+                          "item_cyclone", "item_black_king_bar", "item_guardian_greaves", "item_pipe",
+                          "item_aether_lens", "item_veil_of_discord", "item_shivas_guard", "item_sheepstick"]:
             item = self._items_dict.get(item_name)
 
             if item:
                 support_items.append(item)
         return support_items
 
+    def get_utility_items(self) -> list[Dota2Item]:
+        return self._items_utility
+
+    def load_utility_items(self) -> list[Dota2Item]:
+        utility_items = []
+
+        for item_name in ["item_power_treads", "item_vanguard", "item_crimson_guard", "item_blade_mail",
+                          "item_pipe", "item_lotus_orb", "item_shivas_guard", "item_assault",
+                          "item_heart", "item_vladmir"]:
+            item = self._items_dict.get(item_name)
+
+            if item:
+                utility_items.append(item)
+        return utility_items
+
     def get_support_items(self) -> list[Dota2Item]:
         return self._items_support
+
 
     def get_items_list(self) -> list[Dota2Item]:
         return self._items_list

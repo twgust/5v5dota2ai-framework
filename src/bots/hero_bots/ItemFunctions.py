@@ -230,7 +230,7 @@ def buy_suitable_item(hero: PlayerHero, role: Dota2Role, attributes: list[Dota2A
     elif role == Dota2Role.SUPPORT:
         items = item_lists.get_support_items()
     elif role == Dota2Role.UTILITY:
-        pass
+        items = item_lists.get_utility_items()
     else:
         return False
 
@@ -315,9 +315,9 @@ def calculate_item_score(hero: PlayerHero, item: Dota2Item, role: Dota2Role, att
     if role == Dota2Role.CARRY:
         return calculate_carry_item_score(hero, item, attribute, world)
     elif role == Dota2Role.SUPPORT:
-        return calculate_support_item_score(hero, item, attribute)
+        return calculate_support_item_score(hero, item, attribute, world)
     elif role == Dota2Role.UTILITY:
-        return calculate_utility_item_score(hero, item, attribute)
+        return calculate_utility_item_score(hero, item, attribute, world)
     return 0
 
 
@@ -365,9 +365,118 @@ def calculate_carry_item_score(hero: PlayerHero, item: Dota2Item, attribute: lis
     return score
 
 
-def calculate_support_item_score(hero: PlayerHero, item: Dota2Item, attributes: list[Dota2Attribute]) -> float:
-    return 0
+def calculate_support_item_score(hero: PlayerHero, item: Dota2Item, attribute: list[Dota2Attribute],
+                               world: World) -> float:
+    """
+        hero (PlayerHero): The hero who's doing the purchasing
+        item (Dota2Item): The item that the hero wishes to purchase
+        attribute (Dota2Attribute): The attribute that the hero wishes to prioritize
+        """
+    score = 0
+    bonus_damage_weight = 2.0
+    print("BEGIN: " + item.name)
+    pprint(item.attribute)
+    if hero_has_item(hero, item) or courier_has_item(hero, item, world):
+        print("hero already has this item, skipping", item.name)
+        return score
+
+    # Add 2 points for every point of the desired attribute
+    for attribute in attribute:
+        if str(attribute.value) in item.attribute.keys():
+            score += float(item.attribute[str(attribute.value)]) * 2
+
+    if "bonus_all_stats" in item.attribute.keys():
+        score += float(item.attribute["bonus_all_stats"]) * 2
+        print("----bonus_all_stats " + str(score))
+
+    if "health_regen" in item.attribute.keys():
+        score += float(item.attribute["health_regen"])
+        print("----health_regen " + str(score))
+
+    if "mana_regen" in item.attribute.keys():
+        score += float(item.attribute["mana_regen"])
+        print("----mana_regen " + str(score))
+
+    # Add 0.1 points for every range point
+    if "bonus_cast_range" in item.attribute.keys():
+        score += float(item.attribute["bonus_cast_range"]) * 0.1
+        print("----bonus_damage " + str(score))
+
+     # Add 0.1 points for every range point
+    if "armor" in item.attribute.keys():
+        score += float(item.attribute["armor"]) * 1
+        print("----armor " + str(score))
+
+    # Add 1 point for every mana regen point
+    if "bonus_mana_regen" in item.attribute.keys():
+        score += float(item.attribute["bonus_mana_regen"])
+        print("----bonus_attack_speed " + str(score))
+
+    # Add 1 point for every 2% magic resistance
+    if "bonus_magic_resistance" in item.attribute.keys():
+        score += float(item.attribute["bonus_magic_resistance"]) // 2
+        print("----magic_resistance" + str(score))
+
+    # Add 1 point for every 3 points of armor
+    if "bonus_armor" in item.attribute.keys():
+        score += float(item.attribute["bonus_armor"]) // 3
+        print("----bonus_armor " + str(score))
+    print(item.name + ", score: " + str(score))
+    print("END\n")
+    return score
 
 
-def calculate_utility_item_score(hero: PlayerHero, item: Dota2Item, attributes: list[Dota2Attribute]) -> float:
-    return 0
+def calculate_utility_item_score(hero: PlayerHero, item: Dota2Item, attribute: list[Dota2Attribute],
+                               world: World) -> float:
+    """
+        hero (PlayerHero): The hero who's doing the purchasing
+        item (Dota2Item): The item that the hero wishes to purchase
+        attribute (Dota2Attribute): The attribute that the hero wishes to prioritize
+    """
+    score = 0
+    bonus_damage_weight = 2.0
+    print("BEGIN: " + item.name)
+    pprint(item.attribute)
+    if hero_has_item(hero, item) or courier_has_item(hero, item, world):
+        print("hero already has this item, skipping", item.name)
+        return score
+
+    # Add 2 points for every point of the desired attribute
+    for attribute in attribute:
+        if str(attribute.value) in item.attribute.keys():
+            score += float(item.attribute[str(attribute.value)]) * 2
+
+    if "bonus_all_stats" in item.attribute.keys():
+        score += float(item.attribute["bonus_all_stats"]) * 2
+        print("----bonus_all_stats " + str(score))
+
+    # Add 0.1 points for every range point
+    if "bonus_armor" in item.attribute.keys():
+        score += float(item.attribute["bonus_armor"])
+        print("----bonus_armor " + str(score))
+
+    if "armor" in item.attribute.keys():
+        score += float(item.attribute["armor"]) * 2
+        print("----armor " + str(score))
+
+    if "health_regen" in item.attribute.keys():
+        score += float(item.attribute["health_regen"]) * 2
+        print("----health_regen " + str(score))
+
+    # Add 1 point for every mana regen point
+    if "bonus_health_regen" in item.attribute.keys():
+        score += float(item.attribute["bonus_health_regen"])
+        print("----bonus_health_regen " + str(score))
+
+    # Add 1 point for every 2% magic resistance
+    if "bonus_health" in item.attribute.keys():
+        score += float(item.attribute["bonus_health"]) // 10
+        print("----bonus_health " + str(score))
+
+    # Add 1 point for every 3 points of armor
+    if "bonus_magic_resistance" in item.attribute.keys():
+        score += float(item.attribute["bonus_magic_resistance"]) // 3
+        print("----bonus_magic_resistance " + str(score))
+    print(item.name + ", score: " + str(score))
+    print("END\n")
+    return score

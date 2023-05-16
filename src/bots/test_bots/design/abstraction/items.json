@@ -1700,7 +1700,7 @@
     "id": 56,
     "img": "/apps/dota2/images/dota_react/items/ring_of_health.png?t=1593393829403",
     "dname": "Ring of Health",
-    "qual": "component",
+    "qual": "secret_shop",
     "cost": 700,
     "notes": "",
     "attrib": [
@@ -1722,7 +1722,7 @@
     "id": 57,
     "img": "/apps/dota2/images/dota_react/items/void_stone.png?t=1593393829403",
     "dname": "Void Stone",
-    "qual": "component",
+    "qual": "secret_shop",
     "cost": 700,
     "notes": "",
     "attrib": [

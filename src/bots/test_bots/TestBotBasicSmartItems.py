@@ -58,7 +58,7 @@ party: dict[int, dict[str, HeroData]] = {
         "npc_dota_hero_bane": {
             "boots": ARCANE,
             "lane": BOT,
-            "role": Dota2Role.SUPPORT,
+            "role": Dota2Role.CARRY,
             "attribute": "universal"
         },
         "npc_dota_hero_disruptor": {
@@ -215,8 +215,9 @@ class TestBotBasicSmartItems(BaseBot):
             attributes = [Dota2Attribute.BONUS_DAMAGE, Dota2Attribute.BONUS_ATTACK_SPEED,
                           Dota2Attribute.BONUS_LIFESTEAL]
             role = party[self._world.get_team()][hero.get_name()]["role"]  # Use to get specified role of the hero
+            assert isinstance(role, Dota2Role)
             attribute = party[self._world.get_team()][hero.get_name()]["attribute"]  # Use to get specified attribute of the hero
-            if ItemFunctions.buy_suitable_item(hero, Dota2Role.CARRY, attributes, self._items, self._world):
+            if ItemFunctions.buy_suitable_item(hero, role, attributes, self._items, self._world):
                 return
 
         if game_ticks == 1:
