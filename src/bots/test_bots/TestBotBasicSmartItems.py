@@ -211,6 +211,8 @@ class TestBotBasicSmartItems(BaseBot):
             if hero.get_buyback_cooldown_time() == 0 and hero.get_gold() >= hero.get_buyback_cost():
                 hero.buyback()
                 return"""
+        if game_ticks % 360 == 0:
+            self.reset_courier_status(hero)
         if game_ticks % 100 == 0:
             attributes = [Dota2Attribute.BONUS_DAMAGE, Dota2Attribute.BONUS_ATTACK_SPEED,
                           Dota2Attribute.BONUS_LIFESTEAL]
@@ -234,6 +236,10 @@ class TestBotBasicSmartItems(BaseBot):
         #  hero.buy("item_quelling_blade")
         #    return
         if game_ticks % 25 == 0:
+            if len(hero.get_stash_items()) > 0:
+                hero.courier_retrieve()
+                self.courier_transfer_all_items(hero)
+                return
             if self.courier_has_items(hero):
                 if self.courier_transfer_all_items(hero):
                     return
@@ -263,6 +269,17 @@ class TestBotBasicSmartItems(BaseBot):
            # return
 
         self.make_choice(hero, game_ticks)
+
+    def reset_courier_status(self, hero: PlayerHero) -> None:
+        courier = self._world.get_entity_by_id(hero.get_courier_id())
+        if isinstance(courier, Courier):
+            if len(courier.get_items()) == 0:
+                if courier.is_in_range_of_home_shop():
+                    hero.set_courier_transferring_items(False)
+                if courier.is_in_range_of_secret_shop():
+                    hero.set_courier_moving_to_secret_shop(False)
+                    hero.courier_retrieve()
+
 
     def buy_tp_scroll(self, hero: PlayerHero) -> bool:
         if hero.get_gold() >= 100 and hero.is_in_range_of_home_shop() and hero.get_tp_scroll_charges() < 2:

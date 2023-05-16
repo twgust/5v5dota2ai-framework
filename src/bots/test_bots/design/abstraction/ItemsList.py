@@ -65,7 +65,7 @@ class ItemsList:
                           "item_assault", "item_diffusal_blade", "item_hurricane_pike",
                           "item_sange_and_yasha", "item_heavens_halberd", "item_nullifier",
                           "item_bloodthorn", "item_ethereal_blade", "item_radiance",
-                          "item_heart", "item_armlet", "item_falcon_blade", "item_sange",
+                          "item_heart", "item_armlet", "item_sange",
                           "item_yasha", "item_kaya", "item_echo_sabre", "item_maelstrom", "item_mjollnir"]:
 
             item = self._items_dict.get(item_name)
