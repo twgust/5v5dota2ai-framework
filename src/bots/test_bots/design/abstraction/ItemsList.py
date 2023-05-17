@@ -99,7 +99,7 @@ class ItemsList:
 
         for item_name in ["item_power_treads", "item_vanguard", "item_crimson_guard", "item_blade_mail",
                           "item_pipe", "item_lotus_orb", "item_shivas_guard", "item_assault",
-                          "item_heart", "item_vladmir"]:
+                          "item_heart", "item_vladmir", "item_buckler"]:
             item = self._items_dict.get(item_name)
 
             if item:

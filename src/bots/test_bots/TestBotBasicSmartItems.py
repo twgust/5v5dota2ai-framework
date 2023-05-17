@@ -244,8 +244,9 @@ class TestBotBasicSmartItems(BaseBot):
                 if self.courier_transfer_all_items(hero):
                     return
 
-        if self.buy_tp_scroll(hero):
-            return
+        if game_ticks % 20 == 0:
+            if self.buy_tp_scroll(hero):
+                return
 
         if hero.get_gold() > 2000:  # ITEM BUYING ALGO
             pass

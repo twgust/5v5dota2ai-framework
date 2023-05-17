@@ -207,8 +207,9 @@ class TestBotBasicSmart(BaseBot):
             hero.buy("item_boots")
             return
 
-        if self.buy_tp_scroll(hero):
-            return
+        if game_ticks % 20 == 0:
+            if self.buy_tp_scroll(hero):
+                return
 
         # if self.place_observer_ward(hero):
         #     return

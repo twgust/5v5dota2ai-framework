@@ -15,7 +15,23 @@ from game.world import World
 
 
 def generate_item_components_list(item: RecipeItem, hero_items: list[Item]) -> list:
-    required_components = item.get_required_items()
+    """
+    This function generates a list of item components that are required to purchase a recipe item.
+    Checks item for sub-recipe items and adds their components to the list.
+    Checks if hero has the required components and adds them to the list if they are missing.
+    Parameters:
+    item (RecipeItem): The RecipeItem to be purchased.
+    hero_items (list[Item]): The items that the hero currently owns.
+    Returns:
+    list: A list of item components that are required to purchase a recipe item.
+    """
+    required_components = []
+    for component in item.get_required_items():
+        if isinstance(component, RecipeItem):
+            for sub_component in component.get_required_items():
+                required_components.append(sub_component)
+        else:
+            required_components.append(component)
     hero_component_counts = Counter(component.name for component in hero_items)
     required_component_counts = Counter(component.name for component in required_components)
     item_names_list = []
@@ -334,8 +350,7 @@ def calculate_carry_item_score(hero: PlayerHero, item: Dota2Item, attribute: lis
     pprint(item.attribute)
     if hero_has_item(hero, item) or courier_has_item(hero, item, world):
         print("hero already has this item, skipping", item.name)
-        score = 0
-        return score
+        return 0
 
     # Add 2 points for every point of the desired attribute
     for attribute in attribute:
@@ -373,13 +388,13 @@ def calculate_support_item_score(hero: PlayerHero, item: Dota2Item, attribute: l
         item (Dota2Item): The item that the hero wishes to purchase
         attribute (Dota2Attribute): The attribute that the hero wishes to prioritize
         """
-    score = 0
+    score = 1
     bonus_damage_weight = 2.0
     print("BEGIN: " + item.name)
     pprint(item.attribute)
     if hero_has_item(hero, item) or courier_has_item(hero, item, world):
         print("hero already has this item, skipping", item.name)
-        return score
+        return 0
 
     # Add 2 points for every point of the desired attribute
     for attribute in attribute:
@@ -434,13 +449,13 @@ def calculate_utility_item_score(hero: PlayerHero, item: Dota2Item, attribute: l
         item (Dota2Item): The item that the hero wishes to purchase
         attribute (Dota2Attribute): The attribute that the hero wishes to prioritize
     """
-    score = 0
+    score = 1
     bonus_damage_weight = 2.0
     print("BEGIN: " + item.name)
     pprint(item.attribute)
     if hero_has_item(hero, item) or courier_has_item(hero, item, world):
         print("hero already has this item, skipping", item.name)
-        return score
+        return 0
 
     # Add 2 points for every point of the desired attribute
     for attribute in attribute:
