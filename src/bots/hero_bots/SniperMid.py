@@ -79,7 +79,7 @@ class SniperMid(BaseHero):
             # step 2: get item u want to buy
             recipe_item = dic_ref.get("item_bracer")
             # step 3: buy item
-            ItemFunctions.buy_recipe_item(recipe_item, hero, world)
+            ItemFunctions.buy_recipe_item(recipe_item, hero, world, self._items_list)
             return
         if self._shared_functions.attack_enemy_hero(hero, world):
             if self._shared_functions.attacked_by_tower(hero, world):

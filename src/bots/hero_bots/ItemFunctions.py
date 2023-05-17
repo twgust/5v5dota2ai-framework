@@ -1,4 +1,4 @@
-from enum import Enum
+
 
 from bots.hero_bots.Dota2ItemAttribute import Dota2Attribute
 from bots.hero_bots.Dota2PlayerHeroRole import Dota2Role
@@ -14,7 +14,7 @@ from collections import Counter
 from game.world import World
 
 
-def generate_item_components_list(item: RecipeItem, hero_items: list[Item]) -> list:
+def generate_item_components_list(item: RecipeItem, hero_items: list[Item], all_items: ItemsList) -> list:
     """
     This function generates a list of item components that are required to purchase a recipe item.
     Checks item for sub-recipe items and adds their components to the list.
@@ -27,8 +27,8 @@ def generate_item_components_list(item: RecipeItem, hero_items: list[Item]) -> l
     """
     required_components = []
     for component in item.get_required_items():
-        if isinstance(component, RecipeItem):
-            for sub_component in component.get_required_items():
+        if isinstance(all_items.get_recipe_item_dict().get(component.get_name()), RecipeItem):
+            for sub_component in all_items.get_recipe_item_dict().get(component.get_name()).get_required_items():
                 required_components.append(sub_component)
         else:
             required_components.append(component)
@@ -89,7 +89,7 @@ def get_all_the_items(hero: PlayerHero, world: World) -> list:
     return item_list
 
 
-def attempt_complete_item_purchase(item: RecipeItem, hero: PlayerHero, world: World) -> bool:
+def attempt_complete_item_purchase(item: RecipeItem, hero: PlayerHero, world: World, all_items: ItemsList) -> bool:
     """
     Attempts to purchase a complete item using its recipe.
     Parameters:
@@ -98,7 +98,7 @@ def attempt_complete_item_purchase(item: RecipeItem, hero: PlayerHero, world: Wo
     bool: True if the purchase was successful, False otherwise.
     """
 
-    components = generate_item_components_list(item, get_all_the_items(hero, world))
+    components = generate_item_components_list(item, get_all_the_items(hero, world,), all_items)
     if hero.get_gold() > item.cost:
         hero.buy_combined(components)
         return True
@@ -106,7 +106,7 @@ def attempt_complete_item_purchase(item: RecipeItem, hero: PlayerHero, world: Wo
         return False
 
 
-def buy_recipe_item(item: RecipeItem, hero: PlayerHero, world: World) -> bool:
+def buy_recipe_item(item: RecipeItem, hero: PlayerHero, world: World, all_items: ItemsList) -> bool:
     """
         This function attempts to buy a recipe item by first checking if the player can afford to buy the complete item
         using `attempt_complete_item_purchase`, and if not, it attempts to buy the item's required components using
@@ -114,10 +114,11 @@ def buy_recipe_item(item: RecipeItem, hero: PlayerHero, world: World) -> bool:
 
         :param item: A `RecipeItem` object representing the item to be purchased.
         :param hero: An instanceo of a PlayerHero
+        :param all_items: A list of all Dota2Item objects in the game
         :return: A boolean value indicating whether the purchase was successful.
         """
     # components = item.get_required_items()
-    buy_status = attempt_complete_item_purchase(item, hero, world)
+    buy_status = attempt_complete_item_purchase(item, hero, world, all_items)
     if not buy_status:
         return attempt_partial_item_purchase(item, hero)
     elif buy_status:
@@ -146,7 +147,7 @@ def item_in_inventory(item: Dota2Item, hero: PlayerHero) -> bool:
     return False
 
 
-def buy_max_build_item(potential_items: list[Dota2Item], hero: PlayerHero, world: World) -> bool:
+def buy_max_build_item(potential_items: list[Dota2Item], hero: PlayerHero, world: World, all_items: ItemsList) -> bool:
     """
     This function buys the highest-cost item that a player can afford,
     among the potential items passed in the argument, for the given hero.
@@ -156,6 +157,7 @@ def buy_max_build_item(potential_items: list[Dota2Item], hero: PlayerHero, world
     :param potential_items: A list of potential Dota2Item objects that the hero can buy.
     :param hero: A PlayerHero object representing the hero who wants to buy the item.
     :param world: A world object representing the world in game state
+    :param all_items: A list of all Dota2Item objects in the game
     """
     if potential_items:
         max_cost_item = max(potential_items,
@@ -163,7 +165,7 @@ def buy_max_build_item(potential_items: list[Dota2Item], hero: PlayerHero, world
         if max_cost_item is not None:
             if not item_in_inventory(max_cost_item, hero):
                 if isinstance(max_cost_item, RecipeItem):
-                    hero.buy_combined(generate_item_components_list(max_cost_item, get_all_the_items(hero, world)))
+                    hero.buy_combined(generate_item_components_list(max_cost_item, get_all_the_items(hero, world), all_items))
                 else:
                     hero.buy(max_cost_item.name)
                 return True
@@ -250,9 +252,8 @@ def buy_secret_shop_item(hero: PlayerHero, item: Dota2Item, world: World) -> boo
 
 
 def buy_suitable_item(hero: PlayerHero, role: Dota2Role, attributes: list[Dota2Attribute],
-                      item_lists: ItemsList, world: World) -> bool:
+                      item_lists: ItemsList, world: World, all_items: ItemsList) -> bool:
     print("hero: " + hero.get_name() + " role: " + role.name)
-    items = []
     if role == Dota2Role.CARRY:
         items = item_lists.get_carry_items()
     elif role == Dota2Role.SUPPORT:
@@ -261,7 +262,7 @@ def buy_suitable_item(hero: PlayerHero, role: Dota2Role, attributes: list[Dota2A
         items = item_lists.get_utility_items()
     else:
         return False
-    return buy_highest_score_item(hero, role, attributes, items, world)
+    return buy_highest_score_item(hero, role, attributes, items, world, all_items)
 
 def get_courier(hero: PlayerHero, world: World) -> Courier:
     courier = world.get_entity_by_id(hero.get_courier_id())
@@ -302,7 +303,7 @@ def filter_max_score_item(hero: PlayerHero, role: Dota2Role, attributes: list[Do
     return None
 
 def buy_highest_score_item(hero: PlayerHero, role: Dota2Role, attributes: list[Dota2Attribute],
-                           item_list: list[Dota2Item], world: World) -> bool:
+                           item_list: list[Dota2Item], world: World, all_items: ItemsList) -> bool:
     """
     This function calculates the highest score among the items in the item_list passed in the argument,
     for the given hero. It takes a list of potential_items (a list of Dota2Item objects) and a hero (a PlayerHero object)
@@ -315,14 +316,14 @@ def buy_highest_score_item(hero: PlayerHero, role: Dota2Role, attributes: list[D
         if isinstance(max_score_item, RecipeItem):
             if is_item_secret_shop(max_score_item):
                 if courier.is_in_range_of_secret_shop():
-                    hero.buy_combined(generate_item_components_list(max_score_item, get_all_the_items(hero, world)))
+                    hero.buy_combined(generate_item_components_list(max_score_item, get_all_the_items(hero, world),all_items))
                     return True
                 else:
                     courier_to_secret_shop(hero, world)
                     return True
             else:
                 print("BUYING RECIPE ITEM")
-                hero.buy_combined(generate_item_components_list(max_score_item, get_all_the_items(hero, world)))
+                hero.buy_combined(generate_item_components_list(max_score_item, get_all_the_items(hero, world), all_items))
                 return True
         else:
             if max_score_item.secret_shop:
@@ -389,7 +390,7 @@ def calculate_carry_item_score(hero: PlayerHero, item: Dota2Item, attribute: lis
         score += float(item.attribute["bonus_attack_speed"]) // 10
         print("----bonus_attack_speed " + str(score))
 
-    # Add 1 point for every 3% lifesteal
+    # Add 1 point for every 3% life steal
     if "lifesteal_percent" in item.attribute.keys():
         score += float(item.attribute["lifesteal_percent"]) // 3
         print("----lifesteal_percent " + str(score))

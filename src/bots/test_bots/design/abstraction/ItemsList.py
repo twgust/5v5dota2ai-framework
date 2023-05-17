@@ -45,6 +45,15 @@ class ItemsList:
         self._items_support = self.load_support_items()
         self._items_utility = self.load_utility_items()
         self.generate_attribute_lists()
+        self.print_required_items(self._items_dict_recipe.get("item_abyssal_blade"))
+        # print keys and values of recipe items dict
+
+    def print_required_items(self, recipe, indent=""):
+        for component in recipe.get_required_items():
+            print(indent + component.name)
+            if self._items_dict_recipe.get(component.name) is not None:
+                my_recipe = self._items_dict_recipe.get(component.name)
+                self.print_required_items(my_recipe, indent + "---")
 
     def get_attribute_list(self, attribute: str) -> list[Dota2Item]:
         if attribute == "Strength":
@@ -108,7 +117,6 @@ class ItemsList:
 
     def get_support_items(self) -> list[Dota2Item]:
         return self._items_support
-
 
     def get_items_list(self) -> list[Dota2Item]:
         return self._items_list
@@ -188,6 +196,7 @@ class ItemsList:
 
     def is_secret_shop_items(self, item: str, data: dict) -> bool:
         return "secret_shop" in data.get(item, {}).get("qual", [])
+
     def createRecipeItem(self, item: str, data: dict) -> RecipeItem:
         """
         This function attempts to create a RecipeItem object from the given item name and data dictionary. If the
@@ -205,7 +214,6 @@ class ItemsList:
 
         for component in item_components:
             temp_attrib_dict = {}
-
             if component is not None or component != "":
                 temp_dota2_item_name = "item_" + component
                 temp_dota2_item_cost = data.get(component).get("cost")
@@ -305,7 +313,8 @@ class ItemsList:
 
                 if self.is_base_item(item, data):
                     secret_shop = self.is_secret_shop_items(item, data)
-                    dota2_item = Dota2Item(name, item_cost, item_has_active_effect, item_notes, attrib_dict, secret_shop)
+                    dota2_item = Dota2Item(name, item_cost, item_has_active_effect, item_notes, attrib_dict,
+                                           secret_shop)
                     self.validateDota2Item(dota2_item)
                     itemlist.append(dota2_item)
                     self.add_to_dictionary(dota2_item)
