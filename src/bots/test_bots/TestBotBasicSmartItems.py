@@ -226,7 +226,7 @@ class TestBotBasicSmartItems(BaseBot):
             role = party[self._world.get_team()][hero.get_name()]["role"]  # Use to get specified role of the hero
             assert isinstance(role, Dota2Role)
             attribute = party[self._world.get_team()][hero.get_name()]["attribute"]  # Use to get specified attribute of the hero
-            if ItemFunctions.buy_suitable_item(hero, role, attributes, self._items, self._world):
+            if ItemFunctions.buy_suitable_item(hero, role, attributes, self._items, self._world, self._items):
                 return
 
         if game_ticks == 1:
