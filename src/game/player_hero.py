@@ -75,9 +75,11 @@ class PlayerHero(Hero):
         self._set_abilities(player_hero_data)
 
     def set_courier_moving_to_secret_shop(self, is_moving: bool):
+        print("set moving to secret shop = " + str(is_moving))
         self._courier_moving_to_secret_shop = is_moving
 
     def set_courier_transferring_items(self, is_transferring: bool):
+        print("set transferring items = " + str(is_transferring))
         self._courier_transferring_items = is_transferring
 
     def get_courier_transferring_items(self) -> bool:
@@ -85,6 +87,7 @@ class PlayerHero(Hero):
 
     def get_courier_moving_to_secret_shop(self) -> bool:
         return self._courier_moving_to_secret_shop
+
     def _set_items(self, player_hero_data: IPlayerHero) -> None:
         self._items = []
 

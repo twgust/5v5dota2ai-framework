@@ -216,17 +216,28 @@ def courier_to_secret_shop(hero: PlayerHero, world: World) -> bool:
     courier = world.get_entity_by_id(hero.get_courier_id())
     assert courier is not None
     if isinstance(courier, Courier):
+        print("is_courier_transferring_items =", hero.get_courier_transferring_items())
+        print("is_courier_moving_to_secret_shop =", hero.get_courier_moving_to_secret_shop())
+
         if hero.get_courier_transferring_items():
-            print(hero.get_name() + " >>courier already transferring items")
+            print(hero.get_name() + " >> courier already transferring items")
+            hero.set_courier_moving_to_secret_shop(False)
+            print("set moving to secret shop =", hero.get_courier_moving_to_secret_shop())
             return False
+
         if hero.get_courier_moving_to_secret_shop():
-            print(hero.get_name() + " >>courier already moving to secret shop!")
+            print(hero.get_name() + " >> courier already moving to secret shop")
+            hero.set_courier_transferring_items(False)
+            print("set transferring items =", hero.get_courier_transferring_items())
             return True
+
         else:
             print(hero.get_name() + " >> courier was idle, now moving to secret shop!")
             hero.courier_secret_shop()
             hero.set_courier_moving_to_secret_shop(True)
             hero.set_courier_transferring_items(False)
+            print("set moving to secret shop =", hero.get_courier_moving_to_secret_shop())
+            print("set transferring items =", hero.get_courier_transferring_items())
             return True
 
 
@@ -240,6 +251,7 @@ def buy_secret_shop_item(hero: PlayerHero, item: Dota2Item, world: World) -> boo
 
 def buy_suitable_item(hero: PlayerHero, role: Dota2Role, attributes: list[Dota2Attribute],
                       item_lists: ItemsList, world: World) -> bool:
+    print("hero: " + hero.get_name() + " role: " + role.name)
     items = []
     if role == Dota2Role.CARRY:
         items = item_lists.get_carry_items()
@@ -249,7 +261,6 @@ def buy_suitable_item(hero: PlayerHero, role: Dota2Role, attributes: list[Dota2A
         items = item_lists.get_utility_items()
     else:
         return False
-
     return buy_highest_score_item(hero, role, attributes, items, world)
 
 def get_courier(hero: PlayerHero, world: World) -> Courier:
@@ -274,6 +285,21 @@ def item_component_of_item(item: Dota2Item, target_items: list[Dota2Item]) -> Re
                     return targets
     return None
 
+def filter_max_score_item(hero: PlayerHero, role: Dota2Role, attributes: list[Dota2Attribute],
+                          item_list: list[Dota2Item], world: World) -> Dota2Item | None:
+    affordable_items = get_affordable_items(hero, item_list)
+    courier = get_courier(hero, world)
+    assert affordable_items is not None
+    for _ in affordable_items:
+        max_score_item = max(affordable_items,
+                             key=lambda item: calculate_item_score(hero, item, role, attributes, world))
+        assert max_score_item is not None
+        if hero_has_item(hero, max_score_item) or courier_has_item(hero, max_score_item, world):
+            affordable_items.remove(max_score_item)
+            print(hero.get_name() + " >> already has item: " + max_score_item.name)
+        else:
+            return max_score_item
+    return None
 
 def buy_highest_score_item(hero: PlayerHero, role: Dota2Role, attributes: list[Dota2Attribute],
                            item_list: list[Dota2Item], world: World) -> bool:
@@ -282,42 +308,38 @@ def buy_highest_score_item(hero: PlayerHero, role: Dota2Role, attributes: list[D
     for the given hero. It takes a list of potential_items (a list of Dota2Item objects) and a hero (a PlayerHero object)
     as input parameters and returns a boolean value indicating if the purchase was successful or not.
     """
-    affordable_items = get_affordable_items(hero, item_list)
+    max_score_item = filter_max_score_item(hero, role, attributes, item_list, world)
     courier = get_courier(hero, world)
-    if affordable_items:
-        max_score_item = max(affordable_items,
-                             key=lambda item: calculate_item_score(hero, item, role, attributes, world))
-        if max_score_item is not None and not hero_has_item(hero, max_score_item) and not courier_has_item(hero,
-                                                                                                           max_score_item,
-                                                                                                           world):
-            print("MAX SCORE AFFORDABLE ITEM = " + max_score_item.name)
-            if isinstance(max_score_item, RecipeItem):
-                if is_item_secret_shop(max_score_item):
-                    if courier.is_in_range_of_secret_shop():
-                        hero.buy_combined(generate_item_components_list(max_score_item, get_all_the_items(hero, world)))
-                        return True
-                    else:
-                        courier_to_secret_shop(hero, world)
-                        return True
-                else:
-                    print("BUYING RECIPE ITEM")
+    if max_score_item:
+        print("MAX SCORE AFFORDABLE ITEM FOR HERO" + hero.get_name() + max_score_item.name)
+        if isinstance(max_score_item, RecipeItem):
+            if is_item_secret_shop(max_score_item):
+                if courier.is_in_range_of_secret_shop():
                     hero.buy_combined(generate_item_components_list(max_score_item, get_all_the_items(hero, world)))
                     return True
-            else:
-                if max_score_item.secret_shop:
-                    if courier.is_in_range_of_secret_shop():
-                        hero.buy(max_score_item.name)
-                        return True
-                    else:
-                        courier_to_secret_shop(hero, world)
-                        return True
                 else:
-                    print("BUYING NON-RECIPE ITEM")
-                    hero.buy(max_score_item.name)
+                    courier_to_secret_shop(hero, world)
+                    return True
+            else:
+                print("BUYING RECIPE ITEM")
+                hero.buy_combined(generate_item_components_list(max_score_item, get_all_the_items(hero, world)))
                 return True
-        print("MAX SCORE ITEM IS NONE OR HERO ALREADY AHS THE ITEM")
-    print("RETURNING FALSE")
-    return False
+        else:
+            if max_score_item.secret_shop:
+                if courier.is_in_range_of_secret_shop():
+                    hero.buy(max_score_item.name)
+                    return True
+                else:
+                    courier_to_secret_shop(hero, world)
+                    return True
+            else:
+                print("BUYING NON-RECIPE ITEM")
+                hero.buy(max_score_item.name)
+                return True
+
+    else:
+        print("MAX SCORE ITEM IS NONE")
+        return False
 
 
 def calculate_item_score(hero: PlayerHero, item: Dota2Item, role: Dota2Role, attribute: list[Dota2Attribute],
